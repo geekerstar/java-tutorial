@@ -13,7 +13,7 @@
     <packaging>pom</packaging>
 
     <name>java-tutorial</name>
-    <url>http://xkcoding.com</url>
+    <url>https://www.jikewenku.com</url>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
