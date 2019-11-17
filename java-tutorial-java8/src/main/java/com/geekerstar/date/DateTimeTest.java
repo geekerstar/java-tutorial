@@ -172,6 +172,9 @@ public class DateTimeTest {
 
         Clock clock = Clock.systemDefaultZone();
         System.out.println(clock.millis());
+        Clock clock1 = Clock.systemUTC();
+        System.out.println(clock1.instant());
+        System.out.println(clock1.millis());
 
         // 时间计算
         LocalDate now = LocalDate.now();
