@@ -14,6 +14,8 @@ public class StreamTest8 {
         // 首字母转大写
         List<String> list = Arrays.asList("hello", "world", "hello world");
         list.stream().map(item -> item.substring(0,1).toUpperCase()+item.substring(1)).forEach(System.out::println);
+        list.stream().mapToInt(String::length).filter(length -> length == 5).findFirst().ifPresent(System.out::println);
+
 
         System.out.println("-------------");
 
