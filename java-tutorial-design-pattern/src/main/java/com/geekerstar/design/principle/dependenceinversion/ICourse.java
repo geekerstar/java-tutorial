@@ -1,0 +1,10 @@
+package com.geekerstar.design.principle.dependenceinversion;
+
+/**
+ * @author geekerstar
+ * @date 2018/12/9
+ * description
+ */
+public interface ICourse {
+    void studyCourse();
+}

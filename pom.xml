@@ -10,6 +10,7 @@
     <modules>
         <module>java-tutorial-java8</module>
         <module>java-tutorial-jvm</module>
+        <module>java-tutorial-design-pattern</module>
     </modules>
     <packaging>pom</packaging>
 
