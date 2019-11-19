@@ -16,21 +16,21 @@ import static java.time.temporal.TemporalAdjusters.firstDayOfYear;
  * @author geekerstar
  * date: 2019/11/11 14:12
  * description:
- *
- *  LocalDate是一个不可变类，在不考虑时区的情况下可以对日期（不包括时间）进行各种操作，它的默认格式是yyyy-MM-dd
- *
- *  LocalTime与LocalDate一样，也是一个不可变的类，默认格式是hh:mm:ss.zzz，它提供了对时间的各种操作
- *
- *  LocalDateTime是一个不可变的日期-时间对象，它既包含了日期同时又含有时间，默认格式是yyyy-MM-ddTHH-mm-ss.zzz
- *
- *  LocalDate、LocalTime、LocalDateTime、Instant为不可变对象，修改这些对象对象会返回一个副本
+ * <p>
+ * LocalDate是一个不可变类，在不考虑时区的情况下可以对日期（不包括时间）进行各种操作，它的默认格式是yyyy-MM-dd
+ * <p>
+ * LocalTime与LocalDate一样，也是一个不可变的类，默认格式是hh:mm:ss.zzz，它提供了对时间的各种操作
+ * <p>
+ * LocalDateTime是一个不可变的日期-时间对象，它既包含了日期同时又含有时间，默认格式是yyyy-MM-ddTHH-mm-ss.zzz
+ * <p>
+ * LocalDate、LocalTime、LocalDateTime、Instant为不可变对象，修改这些对象对象会返回一个副本
  */
 
 public class DateTimeTest {
 
 
     @Test
-    public void localDate(){
+    public void localDate() {
         LocalDate localDate = LocalDate.now();
         System.out.println(localDate);
 
@@ -64,7 +64,7 @@ public class DateTimeTest {
     }
 
     @Test
-    public void localTime(){
+    public void localTime() {
         LocalTime localTime = LocalTime.now();
         System.out.println(localTime);
 
@@ -91,7 +91,7 @@ public class DateTimeTest {
     }
 
     @Test
-    public void localDateTime(){
+    public void localDateTime() {
         LocalDateTime localDateTime = LocalDateTime.now();
         System.out.println(localDateTime);
 
@@ -124,7 +124,7 @@ public class DateTimeTest {
     }
 
     @Test
-    public void instant(){
+    public void instant() {
         Instant instant = Instant.now();
 
         // 获取秒数
@@ -138,7 +138,7 @@ public class DateTimeTest {
     }
 
     @Test
-    public void modify(){
+    public void modify() {
         LocalDateTime localDateTime = LocalDateTime.now();
 
         // 增加一年
@@ -161,7 +161,7 @@ public class DateTimeTest {
     }
 
     @Test
-    public void calcTime(){
+    public void calcTime() {
         Set<String> set = ZoneId.getAvailableZoneIds();
         Set<String> treeSet = new TreeSet<String>() {
             {
@@ -232,18 +232,18 @@ public class DateTimeTest {
     }
 
     @Test
-    public void compareDate(){
+    public void compareDate() {
         LocalDate localDate = LocalDate.now();
         LocalDate otherDate = LocalDate.of(2018, 11, 11);
 //equals方法用于比较两个日期是否相等
-        if(localDate.equals(otherDate)) {
+        if (localDate.equals(otherDate)) {
             System.out.println("localDate与otherDate相等！");
         } else {
             //isAfter和isBefore方法用于比较两个日期前后顺序
-            if(localDate.isAfter(otherDate)) {
+            if (localDate.isAfter(otherDate)) {
                 System.out.println("localDate晚于otherDate！");
             }
-            if(localDate.isBefore(otherDate)) {
+            if (localDate.isBefore(otherDate)) {
                 System.out.println("localDate早于otherDate！");
             }
         }

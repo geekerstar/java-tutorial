@@ -19,7 +19,6 @@ public class StreamTest4 {
         Arrays.asList(stringArray).forEach(System.out::println);
 
 
-
         Stream<String> stream2 = Stream.of("hello", "world", "hello world");
         List<String> list1 = stream2.collect(Collectors.toList());
         list1.forEach(System.out::println);

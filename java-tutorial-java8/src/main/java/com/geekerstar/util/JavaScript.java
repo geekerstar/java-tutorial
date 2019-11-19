@@ -15,7 +15,7 @@ public class JavaScript {
         ScriptEngine javascript = scriptEngineManager.getEngineByName("JavaScript");
 
         System.out.println(javascript.getClass().getName());
-        System.out.println("Result:"+javascript.eval("function f() { return 10; }; f() * 24;"));
+        System.out.println("Result:" + javascript.eval("function f() { return 10; }; f() * 24;"));
     }
 
 }

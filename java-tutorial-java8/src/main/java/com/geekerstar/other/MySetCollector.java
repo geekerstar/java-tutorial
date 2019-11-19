@@ -11,7 +11,7 @@ import java.util.stream.Collector;
 import static java.util.stream.Collector.Characteristics.IDENTITY_FINISH;
 import static java.util.stream.Collector.Characteristics.UNORDERED;
 
-public class MySetCollector<T> implements Collector<T, Set<T>, Set<T>>{
+public class MySetCollector<T> implements Collector<T, Set<T>, Set<T>> {
 
     @Override
     public Supplier<Set<T>> supplier() {

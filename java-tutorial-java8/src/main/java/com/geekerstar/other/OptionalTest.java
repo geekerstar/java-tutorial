@@ -21,6 +21,5 @@ public class OptionalTest {
         System.out.println(optional.orElseGet(() -> "nihao"));
 
 
-
     }
 }

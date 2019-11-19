@@ -28,7 +28,7 @@ public class StreamTest5 {
 
         System.out.println("----------");
 
-        Stream<List<Integer>> stream = Stream.of(Arrays.asList(1,2), Arrays.asList(2, 3), Arrays.asList(4, 5, 6));
+        Stream<List<Integer>> stream = Stream.of(Arrays.asList(1, 2), Arrays.asList(2, 3), Arrays.asList(4, 5, 6));
         stream.flatMap(theList -> theList.stream())
                 .map(item -> item * item)
                 .forEach(System.out::println);

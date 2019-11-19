@@ -1,7 +1,7 @@
 package com.geekerstar.other;
 
 
-public class AutoCloseableTest implements AutoCloseable{
+public class AutoCloseableTest implements AutoCloseable {
 
     public void doSomething() {
         System.out.println("doSomething invoked!");
@@ -14,7 +14,7 @@ public class AutoCloseableTest implements AutoCloseable{
 
     public static void main(String[] args) throws Exception {
 
-        try(AutoCloseableTest autoCloseableTest = new AutoCloseableTest()) {
+        try (AutoCloseableTest autoCloseableTest = new AutoCloseableTest()) {
             autoCloseableTest.doSomething();
         }
 

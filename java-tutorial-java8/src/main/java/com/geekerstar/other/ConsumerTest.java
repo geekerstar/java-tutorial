@@ -17,7 +17,7 @@ public class ConsumerTest {
         IntConsumer intConsumer = System.out::println;
 
         System.out.println(consumer instanceof Consumer);
-        System.out.println(intConsumer instanceof  IntConsumer);
+        System.out.println(intConsumer instanceof IntConsumer);
 
         consumerTest.test(consumer); //面向对象方式
         consumerTest.test(consumer::accept); //函数式方式

@@ -39,13 +39,12 @@ public class PredicateTest2 {
         System.out.println(predicateTest2.isEqual(new Date()).test(new Date()));
 
 
-
     }
 
 
     public void conditionFilter(List<Integer> list, Predicate<Integer> predicate) {
-        for(Integer integer : list) {
-            if(predicate.test(integer)) {
+        for (Integer integer : list) {
+            if (predicate.test(integer)) {
                 System.out.println(integer);
             }
         }
@@ -53,8 +52,8 @@ public class PredicateTest2 {
 
     public void conditionFilter2(List<Integer> list, Predicate<Integer> predicate,
                                  Predicate<Integer> predicate2) {
-        for(Integer integer : list) {
-            if(predicate.and(predicate2).negate().test(integer)) {
+        for (Integer integer : list) {
+            if (predicate.and(predicate2).negate().test(integer)) {
                 System.out.println(integer);
             }
         }
@@ -63,13 +62,13 @@ public class PredicateTest2 {
 
     /**
      * 判断两个参数是否相同
+     *
      * @param object
      * @return
      */
     public Predicate<Date> isEqual(Object object) {
         return Predicate.isEqual(object);
     }
-
 
 
 //    public void findAllEvens(List<Integer> list) {
@@ -79,9 +78,6 @@ public class PredicateTest2 {
 //            }
 //        }
 //    }
-
-
-
 
 
 }

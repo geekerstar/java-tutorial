@@ -75,7 +75,6 @@ public class MethodReferenceTest {
         students.forEach(student -> System.out.println(student.getName()));
 
 
-
         List<String> cities = Arrays.asList("qingdao", "chongqing", "tianjin", "beijing");
 
         Collections.sort(cities, (city1, city2) -> city1.compareToIgnoreCase(city2));

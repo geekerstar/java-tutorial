@@ -31,6 +31,5 @@ public class StreamTest6 {
 //        limit.filter(item -> item > 2).mapToInt(item -> item * 2).skip(2).limit(2).max().ifPresent(System.out::println);
 
 
-
     }
 }

@@ -28,7 +28,7 @@ public class StreamTest14 {
         // list里面的数据
         System.out.println("lists原来的数据:");
 
-        for (Integer elem : lists){
+        for (Integer elem : lists) {
             System.out.print(elem + " ");
         }
         System.out.println();
@@ -37,7 +37,7 @@ public class StreamTest14 {
         System.out.print("lists的最小值");
         Stream<Integer> stream = lists.stream();
         Optional<Integer> min = stream.min(Integer::compareTo);
-        if (min.isPresent()){
+        if (min.isPresent()) {
             System.out.println(min.get());
         }
 
@@ -48,7 +48,7 @@ public class StreamTest14 {
         // 排序
         System.out.print("将list流进行排序");
         Stream<Integer> sorted = lists.stream().sorted();
-        sorted.forEach(elem -> System.out.print(elem+""));
+        sorted.forEach(elem -> System.out.print(elem + ""));
         System.out.println();
 
         // 过滤
@@ -69,7 +69,7 @@ public class StreamTest14 {
 
         // 看看原来的list有没有变化
         System.out.print("原来list里的数据");
-        for (Integer elem : lists){
+        for (Integer elem : lists) {
             System.out.print(elem + "");
 
         }
@@ -79,52 +79,44 @@ public class StreamTest14 {
 
 
         // 缩减操作
-        Optional<Integer> sum = lists.stream().reduce((a,b)-> a + b);
+        Optional<Integer> sum = lists.stream().reduce((a, b) -> a + b);
         if (sum.isPresent()) {
             System.out.println("list的总和为：" + sum.get());
         }
 
-        Integer sum2 = lists.stream().reduce(0,(a,b)->a+b);
+        Integer sum2 = lists.stream().reduce(0, (a, b) -> a + b);
         System.out.println("list的总和为：" + sum2);
 
         // 乘积
-        Optional<Integer> product = lists.stream().reduce((a,b) -> a*b);
-        if (product.isPresent()){
-            System.out.println("list的乘积为："+product.get());
+        Optional<Integer> product = lists.stream().reduce((a, b) -> a * b);
+        if (product.isPresent()) {
+            System.out.println("list的乘积为：" + product.get());
         }
-        Integer product2 = lists.stream().reduce(1,(a,b) -> a*b);
-        System.out.println("list的乘积为："+product2);
+        Integer product2 = lists.stream().reduce(1, (a, b) -> a * b);
+        System.out.println("list的乘积为：" + product2);
 
-        Integer product3 = lists.stream().reduce(1,(a,b) -> {
-            if (b % 2 == 0){
-                return a*b;
+        Integer product3 = lists.stream().reduce(1, (a, b) -> {
+            if (b % 2 == 0) {
+                return a * b;
             } else {
                 return a;
             }
         });
-        System.out.println("list的偶数乘积为："+product3);
+        System.out.println("list的偶数乘积为：" + product3);
 
 
         System.out.println();
         System.out.println("===========================");
 
         // 并行流
-        Optional<Integer> sum1 = lists.parallelStream().reduce((a,b) -> a+b);
-        if (sum1.isPresent()){
-            System.out.println("list的总和为："+sum1.get());
+        Optional<Integer> sum1 = lists.parallelStream().reduce((a, b) -> a + b);
+        if (sum1.isPresent()) {
+            System.out.println("list的总和为：" + sum1.get());
         }
-        lists.stream().reduce((a,b)->a+b).ifPresent(System.out::println);
+        lists.stream().reduce((a, b) -> a + b).ifPresent(System.out::println);
 
-        Integer sum3 = lists.stream().reduce(0,(a,b)->a+b);
-        System.out.println("list的总和为"+sum3);
-
-
-
-
-
-
-
-
+        Integer sum3 = lists.stream().reduce(0, (a, b) -> a + b);
+        System.out.println("list的总和为" + sum3);
 
 
     }
