@@ -12,6 +12,7 @@
         <module>java-tutorial-jvm</module>
         <module>java-tutorial-design-pattern</module>
         <module>Java-tutorial-concurrent</module>
+        <module>java-tutorial-io</module>
     </modules>
     <packaging>pom</packaging>
 
