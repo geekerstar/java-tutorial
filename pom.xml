@@ -14,6 +14,7 @@
         <module>Java-tutorial-concurrent</module>
         <module>java-tutorial-io</module>
         <module>java-tutorial-study</module>
+        <module>java-tutorial-interview</module>
     </modules>
     <packaging>pom</packaging>
 
