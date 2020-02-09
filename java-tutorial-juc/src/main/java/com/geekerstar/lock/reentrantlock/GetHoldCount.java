@@ -8,7 +8,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * @description
  */
 public class GetHoldCount {
-    private  static ReentrantLock lock =  new ReentrantLock();
+    private static ReentrantLock lock = new ReentrantLock();
 
     public static void main(String[] args) {
         System.out.println(lock.getHoldCount());

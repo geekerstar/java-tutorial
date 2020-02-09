@@ -10,6 +10,7 @@ public class Person {
     String alice = new String("Alice");
     final String name = alice;
     final TestFinal testFinal = new TestFinal();
+
     public static void main(String[] args) {
         Person person = new Person();
         person.alice = "44";

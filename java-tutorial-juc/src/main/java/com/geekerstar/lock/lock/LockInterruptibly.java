@@ -11,6 +11,7 @@ import java.util.concurrent.locks.ReentrantLock;
 public class LockInterruptibly implements Runnable {
 
     private Lock lock = new ReentrantLock();
+
     public static void main(String[] args) {
         LockInterruptibly lockInterruptibly = new LockInterruptibly();
         Thread thread0 = new Thread(lockInterruptibly);
@@ -25,6 +26,7 @@ public class LockInterruptibly implements Runnable {
         }
         thread1.interrupt();
     }
+
     @Override
     public void run() {
         System.out.println(Thread.currentThread().getName() + "尝试获取锁");

@@ -13,6 +13,7 @@ public class OneShotLatch {
     public void signal() {
         sync.releaseShared(0);
     }
+
     public void await() {
         sync.acquireShared(0);
     }
@@ -39,9 +40,9 @@ public class OneShotLatch {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    System.out.println(Thread.currentThread().getName()+"尝试获取latch，获取失败那就等待");
+                    System.out.println(Thread.currentThread().getName() + "尝试获取latch，获取失败那就等待");
                     oneShotLatch.await();
-                    System.out.println("开闸放行"+Thread.currentThread().getName()+"继续运行");
+                    System.out.println("开闸放行" + Thread.currentThread().getName() + "继续运行");
                 }
             }).start();
         }
@@ -51,9 +52,9 @@ public class OneShotLatch {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                System.out.println(Thread.currentThread().getName()+"尝试获取latch，获取失败那就等待");
+                System.out.println(Thread.currentThread().getName() + "尝试获取latch，获取失败那就等待");
                 oneShotLatch.await();
-                System.out.println("开闸放行"+Thread.currentThread().getName()+"继续运行");
+                System.out.println("开闸放行" + Thread.currentThread().getName() + "继续运行");
             }
         }).start();
     }

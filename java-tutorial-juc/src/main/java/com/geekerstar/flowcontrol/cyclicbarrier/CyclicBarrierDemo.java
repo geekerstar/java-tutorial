@@ -21,7 +21,7 @@ public class CyclicBarrierDemo {
         }
     }
 
-    static class Task implements Runnable{
+    static class Task implements Runnable {
         private int id;
         private CyclicBarrier cyclicBarrier;
 
@@ -34,10 +34,10 @@ public class CyclicBarrierDemo {
         public void run() {
             System.out.println("线程" + id + "现在前往集合地点");
             try {
-                Thread.sleep((long) (Math.random()*10000));
-                System.out.println("线程"+id+"到了集合地点，开始等待其他人到达");
+                Thread.sleep((long) (Math.random() * 10000));
+                System.out.println("线程" + id + "到了集合地点，开始等待其他人到达");
                 cyclicBarrier.await();
-                System.out.println("线程"+id+"出发了");
+                System.out.println("线程" + id + "出发了");
             } catch (InterruptedException e) {
                 e.printStackTrace();
             } catch (BrokenBarrierException e) {

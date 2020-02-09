@@ -29,7 +29,8 @@ public class ThreadLocalNormalUsage2 {
         threadPool.shutdown();
 
     }
-    public String date(int seconds){
+
+    public String date(int seconds) {
         // 参数的单位是毫秒，从1970.1.1 00:00:00 GMT计时
         Date date = new Date(1000 * seconds);
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");

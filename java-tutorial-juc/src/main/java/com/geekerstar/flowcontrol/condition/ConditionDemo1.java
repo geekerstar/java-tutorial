@@ -14,21 +14,21 @@ public class ConditionDemo1 {
 
     void method1() throws InterruptedException {
         lock.lock();
-        try{
+        try {
             System.out.println("条件不满足，开始await");
             condition.await();
             System.out.println("条件满足了，开始执行后续的任务");
-        }finally {
+        } finally {
             lock.unlock();
         }
     }
 
     void method2() {
         lock.lock();
-        try{
+        try {
             System.out.println("准备工作完成，唤醒其他的线程");
             condition.signal();
-        }finally {
+        } finally {
             lock.unlock();
         }
     }

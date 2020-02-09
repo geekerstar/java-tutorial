@@ -66,7 +66,7 @@ class Consumer implements Runnable {
         }
         String msg;
         try {
-            while(!(msg = queue.take()).equals("stop")){
+            while (!(msg = queue.take()).equals("stop")) {
                 System.out.println(msg + "到了");
             }
             System.out.println("所有候选人都结束了");

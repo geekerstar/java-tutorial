@@ -5,7 +5,7 @@ import java.util.concurrent.*;
 /**
  * @author geekerstar
  * @date 2020/2/9 17:49
- * @description 一个Future的使用方法,lambda形式
+ * @description 一个Future的使用方法, lambda形式
  */
 public class OneFutureLambda {
     public static void main(String[] args) {

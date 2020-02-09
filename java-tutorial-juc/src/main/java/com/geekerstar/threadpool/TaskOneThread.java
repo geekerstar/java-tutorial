@@ -11,7 +11,7 @@ public class TaskOneThread {
         thread.start();
     }
 
-    static class Task implements Runnable{
+    static class Task implements Runnable {
 
         @Override
         public void run() {

@@ -5,7 +5,7 @@ import java.util.*;
 /**
  * @author geekerstar
  * @date 2020/2/9 14:25
- * @description Collections.synchronizedList(new ArrayList<E>())
+ * @description Collections.synchronizedList(new ArrayList < E > ())
  */
 public class SynList {
     public static void main(String[] args) {

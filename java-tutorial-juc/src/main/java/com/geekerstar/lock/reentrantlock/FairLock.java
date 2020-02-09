@@ -62,7 +62,7 @@ class PrintQueue {
         queueLock.lock();
         try {
             int duration = new Random().nextInt(10) + 1;
-            System.out.println(Thread.currentThread().getName() + "正在打印，需要" + duration+"秒");
+            System.out.println(Thread.currentThread().getName() + "正在打印，需要" + duration + "秒");
             Thread.sleep(duration * 1000);
         } catch (InterruptedException e) {
             e.printStackTrace();

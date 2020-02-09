@@ -13,6 +13,6 @@ public class ScheduleThreadPool {
     public static void main(String[] args) {
         ScheduledExecutorService scheduledExecutorService = Executors.newScheduledThreadPool(10);
 //        scheduledExecutorService.schedule(new Task(),5, TimeUnit.SECONDS);
-        scheduledExecutorService.scheduleAtFixedRate(new Task(),1,3,TimeUnit.SECONDS);
+        scheduledExecutorService.scheduleAtFixedRate(new Task(), 1, 3, TimeUnit.SECONDS);
     }
 }

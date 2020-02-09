@@ -8,12 +8,12 @@ package com.geekerstar.threadlocal;
 public class ThreadLocalNPE {
     ThreadLocal<Long> longThreadLocal = new ThreadLocal<>();
 
-    public void set(){
+    public void set() {
         longThreadLocal.set(Thread.currentThread().getId());
     }
 
     // 这里long是基本类型，注意装箱拆箱，如果下面为空，返回的会NPE
-    public long get(){
+    public long get() {
         return longThreadLocal.get();
     }
 

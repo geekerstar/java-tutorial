@@ -3,7 +3,6 @@ package com.geekerstar.threadpool;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author geekerstar
@@ -20,7 +19,6 @@ public class ShutDown {
         List<Runnable> runnables = executorService.shutdownNow();
 
 
-
 //        boolean b = executorService.awaitTermination(3L, TimeUnit.SECONDS);
 //        System.out.println(b);
 
@@ -34,7 +32,8 @@ public class ShutDown {
 //        executorService.execute(new ShutDownTask());
     }
 }
-class ShutDownTask implements Runnable{
+
+class ShutDownTask implements Runnable {
 
     @Override
     public void run() {
@@ -43,7 +42,7 @@ class ShutDownTask implements Runnable{
             System.out.println(Thread.currentThread().getName());
 
         } catch (InterruptedException e) {
-            System.out.println(Thread.currentThread().getName()+"被中断了");
+            System.out.println(Thread.currentThread().getName() + "被中断了");
 
         }
     }

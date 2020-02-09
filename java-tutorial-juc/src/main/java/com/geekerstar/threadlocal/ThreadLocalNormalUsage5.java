@@ -8,7 +8,7 @@ import java.util.concurrent.Executors;
 /**
  * @author geekerstar
  * @date 2020/2/7 12:51
- * @description 利用ThreadLocal给每个线程分配自己的dateFormat对象,保证线程安全，高效利用内存
+ * @description 利用ThreadLocal给每个线程分配自己的dateFormat对象, 保证线程安全，高效利用内存
  */
 public class ThreadLocalNormalUsage5 {
 
@@ -29,7 +29,8 @@ public class ThreadLocalNormalUsage5 {
         threadPool.shutdown();
 
     }
-    public String date(int seconds){
+
+    public String date(int seconds) {
         // 参数的单位是毫秒，从1970.1.1 00:00:00 GMT计时
         Date date = new Date(1000 * seconds);
 //        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
@@ -39,13 +40,13 @@ public class ThreadLocalNormalUsage5 {
 }
 
 class ThreadSafeFormatter {
-    public static ThreadLocal<SimpleDateFormat> dateFormatThreadLocal = new ThreadLocal<SimpleDateFormat>(){
+    public static ThreadLocal<SimpleDateFormat> dateFormatThreadLocal = new ThreadLocal<SimpleDateFormat>() {
         @Override
         protected SimpleDateFormat initialValue() {
             return new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
         }
     };
 
-    public static ThreadLocal<SimpleDateFormat> dateFormatThreadLocal2 = ThreadLocal.withInitial(()->new SimpleDateFormat("yyyy-MM-dd hh:mm:ss"));
+    public static ThreadLocal<SimpleDateFormat> dateFormatThreadLocal2 = ThreadLocal.withInitial(() -> new SimpleDateFormat("yyyy-MM-dd hh:mm:ss"));
 
 }

@@ -15,7 +15,7 @@ public class MustUnLock {
         lock.lock();
         try {
             // 获取本锁保护的资源
-            System.out.println(Thread.currentThread().getName()+"开始执行任务");
+            System.out.println(Thread.currentThread().getName() + "开始执行任务");
 
         } finally {
             lock.unlock();

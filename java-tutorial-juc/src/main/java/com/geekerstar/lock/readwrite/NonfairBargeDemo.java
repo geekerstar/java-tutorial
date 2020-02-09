@@ -47,11 +47,11 @@ public class NonfairBargeDemo {
     }
 
     public static void main(String[] args) {
-        new Thread(()->write(),"Thread1").start();
-        new Thread(()->read(),"Thread2").start();
-        new Thread(()->read(),"Thread3").start();
-        new Thread(()->write(),"Thread4").start();
-        new Thread(()->read(),"Thread5").start();
+        new Thread(() -> write(), "Thread1").start();
+        new Thread(() -> read(), "Thread2").start();
+        new Thread(() -> read(), "Thread3").start();
+        new Thread(() -> write(), "Thread4").start();
+        new Thread(() -> read(), "Thread5").start();
         new Thread(new Runnable() {
             @Override
             public void run() {

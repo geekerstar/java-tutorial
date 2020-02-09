@@ -16,7 +16,7 @@ public class FutureTaskDemo {
         service.submit(integerFutureTask);
 
         try {
-            System.out.println("task运行结果："+integerFutureTask.get());
+            System.out.println("task运行结果：" + integerFutureTask.get());
 
         } catch (InterruptedException e) {
             e.printStackTrace();

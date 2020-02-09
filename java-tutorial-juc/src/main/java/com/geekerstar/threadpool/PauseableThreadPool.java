@@ -48,7 +48,7 @@ public class PauseableThreadPool extends ThreadPoolExecutor {
         }
     }
 
-    private void pause(){
+    private void pause() {
         lock.lock();
         try {
             isPaused = true;
@@ -57,7 +57,7 @@ public class PauseableThreadPool extends ThreadPoolExecutor {
         }
     }
 
-    public void resume(){
+    public void resume() {
         lock.lock();
         try {
             isPaused = false;

@@ -10,7 +10,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * @date 2020/2/8 09:49
  * @description 用TryLock来避免死锁
  */
-public class TryLockDeadLock implements Runnable{
+public class TryLockDeadLock implements Runnable {
 
     int flag = 1;
     static Lock lock1 = new ReentrantLock();

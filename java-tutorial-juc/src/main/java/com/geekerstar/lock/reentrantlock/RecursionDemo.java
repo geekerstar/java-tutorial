@@ -14,7 +14,7 @@ public class RecursionDemo {
         lock.lock();
         try {
             System.out.println("已经对资源进行了处理");
-            if (lock.getHoldCount()<5) {
+            if (lock.getHoldCount() < 5) {
                 System.out.println(lock.getHoldCount());
                 accessResource();
                 System.out.println(lock.getHoldCount());
@@ -23,6 +23,7 @@ public class RecursionDemo {
             lock.unlock();
         }
     }
+
     public static void main(String[] args) {
         accessResource();
     }
