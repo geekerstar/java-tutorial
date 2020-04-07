@@ -3,6 +3,7 @@ package com.geekerstar.skills;
 import org.junit.Test;
 
 import java.util.*;
+import java.util.stream.IntStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -441,4 +442,18 @@ public class ArrayTest {
                 new AbstractMap.SimpleEntry<>("b", 2)
         );
     }
+
+    @Test
+    public void max_of_array_containing_10_1_and_5_is_10() throws Exception {
+        OptionalInt max = ArraySnippets.arrayMax(new int[]{10, 1, 5});
+        assertThat(max).hasValue(10);
+    }
+
+    @Test
+    public void min_of_array_containing_10_1_and_5_is_10() throws Exception {
+        OptionalInt min = ArraySnippets.arrayMin(new int[]{10, 1, 5});
+        assertThat(min).hasValue(1);
+    }
+
+
 }

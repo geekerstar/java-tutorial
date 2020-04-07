@@ -2,6 +2,7 @@ package com.geekerstar.skills;
 
 import java.util.*;
 import java.util.AbstractMap.SimpleEntry;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -105,6 +106,9 @@ public abstract class StringSnippets {
                 .toLowerCase();
     }
 
+    public static boolean isAbsoluteUrl(String url) {
+        return Pattern.compile("^[a-z][a-z0-9+.-]*:").matcher(url).find();
+    }
 
     /**
      * 检查字符串是否为小写。
@@ -302,5 +306,9 @@ public abstract class StringSnippets {
      */
     public static int[] stringToIntegers(String numbers) {
         return Arrays.stream(numbers.split(" ")).mapToInt(Integer::parseInt).toArray();
+    }
+
+    public static int[] randomInts(int total, int start, int end) {
+        return ThreadLocalRandom.current().ints(total, start, end).toArray();
     }
 }
