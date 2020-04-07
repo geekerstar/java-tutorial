@@ -1,5 +1,6 @@
 package com.geekerstar.skills;
 
+import java.lang.reflect.Array;
 import java.util.*;
 import java.util.function.*;
 import java.util.stream.Collectors;
@@ -334,6 +335,14 @@ public abstract class ArraySnippets {
                         : val.getKey() == arr.length - 1 ? acc + val.getValue() : acc + val.getValue() + separator, (fst, snd) -> fst);
     }
 
+    public static <T> String join(T[] arr, String separator) {
+        return join(arr, separator, separator);
+    }
+
+    public static <T> String join(T[] arr) {
+        return join(arr, ",");
+    }
+
     /**
      * 返回数组的第n个元素。
      * Use Arrays.copyOfRange() 优先得到包含第n个元素的数组。
@@ -454,6 +463,10 @@ public abstract class ArraySnippets {
                 .filter(a -> Arrays.stream(second).anyMatch(b -> Objects.equals(a, b)))
                 // Make a new array of first's runtime type, but empty content:
                 .toArray(i -> (T[]) Arrays.copyOf(new Object[0], i, first.getClass()));
+    }
+
+    public static <T> T[] emptyArray(Class<T> clz) {
+        return (T[]) Array.newInstance(clz, 0);
     }
 
     /**
