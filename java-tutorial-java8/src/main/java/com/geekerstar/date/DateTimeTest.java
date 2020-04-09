@@ -95,6 +95,8 @@ public class DateTimeTest {
         LocalDateTime localDateTime = LocalDateTime.now();
         System.out.println(localDateTime);
 
+        System.out.println(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").format(LocalDateTime.now()));
+        ;
         LocalDateTime localDateTimeOf = LocalDateTime.of(2019, Month.SEPTEMBER, 10, 14, 56, 44);
         System.out.println(localDateTimeOf);
 
