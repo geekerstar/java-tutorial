@@ -18,6 +18,7 @@
         <module>java-tutorial-juc</module>
         <module>java-tutorial-json</module>
         <module>java-tutorial-source</module>
+        <module>java-tutorial-tools</module>
     </modules>
     <packaging>pom</packaging>
 
