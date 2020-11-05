@@ -8,7 +8,7 @@ public class SaleWindow2 implements Runnable {
      */
     private int id = 10;
 
-    public synchronized  void saleOne(){
+    public synchronized void saleOne() {
         if (id > 0) {
             System.out.println(Thread.currentThread().getName()
                     + "卖了编号为" + id + "的火车票");
@@ -26,7 +26,7 @@ public class SaleWindow2 implements Runnable {
     @Override
     public void run() {
         for (int i = 0; i < 10; i++) {
-           saleOne();
+            saleOne();
         }
     }
 }

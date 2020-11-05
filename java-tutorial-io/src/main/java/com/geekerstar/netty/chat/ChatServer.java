@@ -29,17 +29,17 @@ public class ChatServer {
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         public void initChannel(SocketChannel ch) {
-                            ChannelPipeline pipeline=ch.pipeline();
+                            ChannelPipeline pipeline = ch.pipeline();
                             //往pipeline链中添加一个解码器
-                            pipeline.addLast("decoder",new StringDecoder());
+                            pipeline.addLast("decoder", new StringDecoder());
                             //往pipeline链中添加一个编码器
-                            pipeline.addLast("encoder",new StringEncoder());
+                            pipeline.addLast("encoder", new StringEncoder());
                             //往pipeline链中添加自定义的handler(业务处理类)
                             pipeline.addLast(new ChatServerHandler());
-        }
-    });
+                        }
+                    });
             System.out.println("Netty Chat Server启动......");
-    ChannelFuture f = b.bind(port).sync();
+            ChannelFuture f = b.bind(port).sync();
             f.channel().closeFuture().sync();
         } finally {
             workerGroup.shutdownGracefully();

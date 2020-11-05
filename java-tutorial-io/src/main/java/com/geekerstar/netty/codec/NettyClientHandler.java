@@ -7,7 +7,7 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) {
-        BookMessage.Book  book= BookMessage.Book.newBuilder().setId(1).setName("Java从入门到精通").build();
+        BookMessage.Book book = BookMessage.Book.newBuilder().setId(1).setName("Java从入门到精通").build();
         ctx.writeAndFlush(book);
     }
 

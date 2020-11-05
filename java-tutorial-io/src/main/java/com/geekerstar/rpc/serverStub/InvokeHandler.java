@@ -10,24 +10,24 @@ import java.util.Set;
 //服务器端业务处理类
 public class InvokeHandler extends ChannelInboundHandlerAdapter {
     //得到某接口下某个实现类的名字
-    private String getImplClassName(ClassInfo classInfo) throws Exception{
+    private String getImplClassName(ClassInfo classInfo) throws Exception {
         //服务方接口和实现类所在的包路径
-        String interfacePath="cn.itcast.rpc.server";
+        String interfacePath = "cn.itcast.rpc.server";
         int lastDot = classInfo.getClassName().lastIndexOf(".");
-        String interfaceName=classInfo.getClassName().substring(lastDot);
-        Class superClass=Class.forName(interfacePath+interfaceName);
+        String interfaceName = classInfo.getClassName().substring(lastDot);
+        Class superClass = Class.forName(interfacePath + interfaceName);
         Reflections reflections = new Reflections(interfacePath);
         //得到某接口下的所有实现类
-        Set<Class> ImplClassSet=reflections.getSubTypesOf(superClass);
-        if(ImplClassSet.size()==0){
+        Set<Class> ImplClassSet = reflections.getSubTypesOf(superClass);
+        if (ImplClassSet.size() == 0) {
             System.out.println("未找到实现类");
             return null;
-        }else if(ImplClassSet.size()>1){
+        } else if (ImplClassSet.size() > 1) {
             System.out.println("找到多个实现类，未明确使用哪一个");
             return null;
-        }else {
+        } else {
             //把集合转换为数组
-            Class[] classes=ImplClassSet.toArray(new Class[0]);
+            Class[] classes = ImplClassSet.toArray(new Class[0]);
             return classes[0].getName(); //得到实现类的名字
         }
     }

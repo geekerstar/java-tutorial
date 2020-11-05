@@ -4,8 +4,8 @@ package com.geekerstar.thread.communication.num;
 public class ThreadForNum1 extends Thread {
 
     @Override
-    public void run(){
-        for(int j=0;j<10;j++){
+    public void run() {
+        for (int j = 0; j < 10; j++) {
             synchronized (MyLock.o) {
                 System.out.println(1);
                 MyLock.o.notify();

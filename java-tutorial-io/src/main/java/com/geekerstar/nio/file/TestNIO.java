@@ -12,15 +12,15 @@ import java.nio.channels.FileChannel;
 public class TestNIO {
 
     @Test  //往本地文件中写数据
-    public void  test1() throws  Exception{
+    public void test1() throws Exception {
         //1. 创建输出流
-        FileOutputStream fos=new FileOutputStream("basic.txt");
+        FileOutputStream fos = new FileOutputStream("basic.txt");
         //2. 从流中得到一个通道
-        FileChannel fc=fos.getChannel();
+        FileChannel fc = fos.getChannel();
         //3. 提供一个缓冲区
-        ByteBuffer buffer=ByteBuffer.allocate(1024);
+        ByteBuffer buffer = ByteBuffer.allocate(1024);
         //4. 往缓冲区中存入数据
-        String str="hello,nio";
+        String str = "hello,nio";
         buffer.put(str.getBytes());
         //5. 翻转缓冲区
         buffer.flip();
@@ -31,14 +31,14 @@ public class TestNIO {
     }
 
     @Test  //从本地文件中读取数据
-    public void test2() throws  Exception{
-        File file=new File("basic.txt");
+    public void test2() throws Exception {
+        File file = new File("basic.txt");
         //1. 创建输入流
-        FileInputStream fis=new FileInputStream(file);
+        FileInputStream fis = new FileInputStream(file);
         //2. 得到一个通道
-        FileChannel fc=fis.getChannel();
+        FileChannel fc = fis.getChannel();
         //3. 准备一个缓冲区
-        ByteBuffer buffer=ByteBuffer.allocate((int)file.length());
+        ByteBuffer buffer = ByteBuffer.allocate((int) file.length());
         //4. 从通道里读取数据并存到缓冲区中
         fc.read(buffer);
         System.out.println(new String(buffer.array()));
@@ -47,17 +47,17 @@ public class TestNIO {
     }
 
     @Test  //使用NIO实现文件复制
-    public void test3() throws  Exception{
+    public void test3() throws Exception {
         //1. 创建两个流
-        FileInputStream fis=new FileInputStream("basic.txt");
-        FileOutputStream fos=new FileOutputStream("c:\\test\\basic.txt");
+        FileInputStream fis = new FileInputStream("basic.txt");
+        FileOutputStream fos = new FileOutputStream("c:\\test\\basic.txt");
 
         //2. 得到两个通道
-        FileChannel sourceFC=fis.getChannel();
-        FileChannel destFC=fos.getChannel();
+        FileChannel sourceFC = fis.getChannel();
+        FileChannel destFC = fos.getChannel();
 
         //3. 复制
-        destFC.transferFrom(sourceFC,0,sourceFC.size());
+        destFC.transferFrom(sourceFC, 0, sourceFC.size());
 
         //4. 关闭
         fis.close();

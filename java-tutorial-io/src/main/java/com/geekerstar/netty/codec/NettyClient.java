@@ -19,7 +19,7 @@ public class NettyClient {
                 .handler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel sc) {
-                        sc.pipeline().addLast("encoder",new ProtobufEncoder());
+                        sc.pipeline().addLast("encoder", new ProtobufEncoder());
                         sc.pipeline().addLast(new NettyClientHandler());
                     }
                 });

@@ -19,6 +19,9 @@
         <module>java-tutorial-json</module>
         <module>java-tutorial-source</module>
         <module>java-tutorial-tools</module>
+        <module>java-tutorial-project-mahjong-1.0</module>
+        <module>java-tutorial-project-mahjong-2.0</module>
+        <module>java-tutorial-netty</module>
     </modules>
     <packaging>pom</packaging>
 

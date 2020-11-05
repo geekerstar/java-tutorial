@@ -7,6 +7,7 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 public class ResultHandler extends ChannelInboundHandlerAdapter {
 
     private Object response;
+
     public Object getResponse() {
         return response;
     }

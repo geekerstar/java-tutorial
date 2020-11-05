@@ -33,7 +33,7 @@ public class ChatServer {
     }
 
     //6. 干活儿
-    public void start() throws  Exception{
+    public void start() throws Exception {
         try {
             while (true) { //不停监控
                 if (selector.select(2000) == 0) {
@@ -44,10 +44,10 @@ public class ChatServer {
                 while (iterator.hasNext()) {
                     SelectionKey key = iterator.next();
                     if (key.isAcceptable()) { //连接请求事件
-                        SocketChannel sc=listenerChannel.accept();
+                        SocketChannel sc = listenerChannel.accept();
                         sc.configureBlocking(false);
-                        sc.register(selector,SelectionKey.OP_READ);
-                        System.out.println(sc.getRemoteAddress().toString().substring(1)+"上线了...");
+                        sc.register(selector, SelectionKey.OP_READ);
+                        System.out.println(sc.getRemoteAddress().toString().substring(1) + "上线了...");
                     }
                     if (key.isReadable()) { //读取数据事件
                         readMsg(key);
@@ -62,26 +62,26 @@ public class ChatServer {
     }
 
     //读取客户端发来的消息并广播出去
-    public void readMsg(SelectionKey key) throws Exception{
-        SocketChannel channel=(SocketChannel) key.channel();
-        ByteBuffer buffer=ByteBuffer.allocate(1024);
-        int count=channel.read(buffer);
-        if(count>0){
-            String msg=new String(buffer.array());
+    public void readMsg(SelectionKey key) throws Exception {
+        SocketChannel channel = (SocketChannel) key.channel();
+        ByteBuffer buffer = ByteBuffer.allocate(1024);
+        int count = channel.read(buffer);
+        if (count > 0) {
+            String msg = new String(buffer.array());
             printInfo(msg);
             //发广播
-            broadCast(channel,msg);
+            broadCast(channel, msg);
         }
     }
 
     //给所有的客户端发广播
-    public void broadCast(SocketChannel except,String msg) throws Exception{
+    public void broadCast(SocketChannel except, String msg) throws Exception {
         System.out.println("服务器发送了广播...");
-        for(SelectionKey key:selector.keys()){
-            Channel targetChannel=key.channel();
-            if(targetChannel instanceof SocketChannel && targetChannel!=except){
-                SocketChannel destChannel=(SocketChannel)targetChannel;
-                ByteBuffer buffer=ByteBuffer.wrap(msg.getBytes());
+        for (SelectionKey key : selector.keys()) {
+            Channel targetChannel = key.channel();
+            if (targetChannel instanceof SocketChannel && targetChannel != except) {
+                SocketChannel destChannel = (SocketChannel) targetChannel;
+                ByteBuffer buffer = ByteBuffer.wrap(msg.getBytes());
                 destChannel.write(buffer);
             }
         }
@@ -93,6 +93,7 @@ public class ChatServer {
     }
 
     public static void main(String[] args) throws Exception {
-        new ChatServer().start();;
+        new ChatServer().start();
+        ;
     }
 }

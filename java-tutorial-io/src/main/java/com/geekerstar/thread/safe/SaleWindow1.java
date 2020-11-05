@@ -14,7 +14,7 @@ public class SaleWindow1 implements Runnable {
     @Override
     public void run() {
         for (int i = 0; i < 10; i++) {
-            synchronized (this){
+            synchronized (this) {
                 if (id > 0) {
                     System.out.println(Thread.currentThread().getName()
                             + "卖了编号为" + id + "的火车票");
