@@ -29,6 +29,10 @@
             <version>2.4</version>
             <classifier>jdk15</classifier>
         </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+        </dependency>
         <!-- json-lib还需要以下依赖包 -->
         <dependency>
             <groupId>commons-lang</groupId>
