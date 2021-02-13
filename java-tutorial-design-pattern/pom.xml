@@ -12,7 +12,7 @@
     <artifactId>java-tutorial-design-pattern</artifactId>
 
     <properties>
-        <org.springframework.version>5.0.8.RELEASE</org.springframework.version>
+        <org.springframework.version>5.2.7.RELEASE</org.springframework.version>
     </properties>
 
     <dependencies>
