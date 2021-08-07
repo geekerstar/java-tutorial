@@ -1,9 +1,9 @@
-package com.geekerstar.volatileTest;
+package com.geekerstar.wx;
 
 /**
  * https://mp.weixin.qq.com/s/HAGYzsiWwB7DQ-LT1Q2pZg
  */
-public class VolatileExample {
+public class Test14 {
     public static volatile int count = 0; // 计数器
     public static final int size = 100000; // 循环测试次数
 

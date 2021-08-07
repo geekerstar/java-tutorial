@@ -1,4 +1,4 @@
-package com.geekerstar.task;
+package com.geekerstar.wx.t1;
 
 import java.util.concurrent.Executors;
 

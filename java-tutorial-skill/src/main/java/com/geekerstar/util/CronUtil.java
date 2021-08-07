@@ -1,4 +1,4 @@
-package com.geekerstar.cron;
+package com.geekerstar.util;
 
 /**
  * @ClassName: CronUtil

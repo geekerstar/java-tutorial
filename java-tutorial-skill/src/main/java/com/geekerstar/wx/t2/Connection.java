@@ -1,4 +1,4 @@
-package com.geekerstar.tryWithResource;
+package com.geekerstar.wx.t2;
 
 public class Connection implements AutoCloseable {
     public void sendData() {
