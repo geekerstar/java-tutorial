@@ -20,9 +20,9 @@ public class TestPartition {
             add("30");
             add("40");
         }};
-        System.out.println("分组之前"+ JSONUtil.toJsonStr(list));
+        System.out.println("分组之前" + JSONUtil.toJsonStr(list));
         List<List<String>> list2 = Lists.partition(list, 3);
-        System.out.println("分组之后"+ JSONUtil.toJsonStr(list2));
+        System.out.println("分组之后" + JSONUtil.toJsonStr(list2));
 
     }
 }

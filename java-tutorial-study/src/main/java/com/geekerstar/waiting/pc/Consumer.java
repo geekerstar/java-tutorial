@@ -11,9 +11,11 @@ import java.util.Vector;
 public class Consumer implements Runnable {
     // 公共资源
     private final Vector sharedQueue;
+
     public Consumer(Vector sharedQueue) {
         this.sharedQueue = sharedQueue;
     }
+
     @Override
     public void run() {
         Random r = new Random();

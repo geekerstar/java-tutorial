@@ -5,9 +5,10 @@ package com.geekerstar.innerclass;
  * date: 2019/3/10 19:46
  * description:
  */
-public class Main{
+public class Main {
     /**
      * 怎么创建静态内部类和非静态内部类的实例
+     *
      * @param args
      */
     public static void main(String[] args) {

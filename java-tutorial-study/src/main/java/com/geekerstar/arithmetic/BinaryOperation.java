@@ -4,11 +4,10 @@ package com.geekerstar.arithmetic;
  * @author geekerstar
  * date: 2019/3/2 15:48
  * description:
- *
+ * <p>
  * 阿里蚂蚁金服的面试中出现：要求手写实现“乘除法”
  * 度小满金融的面试中出现过：自己实现Math.sqrt函数
  * 快手的面试中曾出现：使用位运算实现整数加法运算
- *
  */
 public class BinaryOperation {
     public static void main(String[] args) throws Exception {
@@ -17,6 +16,7 @@ public class BinaryOperation {
         System.out.println(binaryMulti2(5, 6));
         System.out.println(binaryDiv(6, 3));
     }
+
     //：a+b
     // 正负数都包含在里面，不用分开处理
     private static int binaryAdd(int a, int b) {
@@ -60,16 +60,16 @@ public class BinaryOperation {
         if (a == 0 || b == 0)
             return 0;
 
-        if(b>a) {
+        if (b > a) {
             int tmp = a;
             a = b;
             b = tmp;
         }
         int res = 0;
         int shift = 0;
-        while(b!=0) {
-            if((b&1)!=0) {
-                res += (a<<shift);
+        while (b != 0) {
+            if ((b & 1) != 0) {
+                res += (a << shift);
             }
             shift += 1;
             b >>= 1;
@@ -114,9 +114,9 @@ public class BinaryOperation {
 
         double delta = 1e-12;//精度
         int count = 0;
-        while(x0*x0-num>delta) {
-            x0 = (x0*x0+num) / (2*x0);
+        while (x0 * x0 - num > delta) {
+            x0 = (x0 * x0 + num) / (2 * x0);
         }
-        return Math.round(x0*1000)/1000.0;//保留三位小数
+        return Math.round(x0 * 1000) / 1000.0;//保留三位小数
     }
 }

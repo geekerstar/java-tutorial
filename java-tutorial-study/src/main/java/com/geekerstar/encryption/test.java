@@ -11,8 +11,8 @@ public class test {
 
     public static void main(String[] args) throws NoSuchAlgorithmException, IOException {
         String password = "123456";
-        String shaPwdString =new sun.misc.BASE64Encoder().encode(java.security.MessageDigest.getInstance("SHA1").digest(password.getBytes()));
-        System.out.println(shaPwdString.substring(0,shaPwdString.length() - 4));
+        String shaPwdString = new sun.misc.BASE64Encoder().encode(java.security.MessageDigest.getInstance("SHA1").digest(password.getBytes()));
+        System.out.println(shaPwdString.substring(0, shaPwdString.length() - 4));
 
         byte[] by = password.getBytes();
         System.out.println(by);

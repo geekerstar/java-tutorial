@@ -6,7 +6,7 @@ import java.io.FileReader;
 public class Demo {
 
     public static void main(String[] args) {
-       // 省略一些代码 （第 1 处）
+        // 省略一些代码 （第 1 处）
         try {
             BufferedReader br = new BufferedReader(new FileReader("file.txt"));
             System.out.println(br.readLine());

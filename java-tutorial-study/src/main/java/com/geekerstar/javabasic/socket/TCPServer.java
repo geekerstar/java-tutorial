@@ -1,7 +1,5 @@
 package com.geekerstar.javabasic.socket;
 
-import com.geekerstar.javabasic.thread.MyThread;
-
 import java.net.ServerSocket;
 import java.net.Socket;
 

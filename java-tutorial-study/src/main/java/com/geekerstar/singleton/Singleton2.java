@@ -11,16 +11,18 @@ public class Singleton2 {
      */
     private static volatile Singleton2 instance = null;
 
-    private Singleton2(){}
+    private Singleton2() {
+    }
 
     /**
      * 双重检查加锁，只有在第一次实例化时，才启用同步机制，提高了性能。
+     *
      * @return
      */
-    public static Singleton2 getInstance(){
-        if (instance == null){
-            synchronized (Singleton2.class){
-                if (instance == null){
+    public static Singleton2 getInstance() {
+        if (instance == null) {
+            synchronized (Singleton2.class) {
+                if (instance == null) {
                     //非原子操作
                     instance = new Singleton2();
                 }

@@ -20,6 +20,7 @@ import java.util.concurrent.TimeUnit;
 @Threads(100)
 public class TryCatchPerformanceTest {
     private static final int forSize = 1000; // 循环次数
+
     public static void main(String[] args) throws RunnerException {
         // 启动基准测试
         Options opt = new OptionsBuilder()

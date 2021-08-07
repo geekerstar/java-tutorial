@@ -9,18 +9,17 @@ public class Method {
 
 
     public static void main(String[] args) {
-        class Something{
-            String startsWith(String s){
+        class Something {
+            String startsWith(String s) {
                 return String.valueOf(s.charAt(0));
             }
         }
 
         Something something = new Something();
-        Converter<String,String> converter = something::startsWith;
+        Converter<String, String> converter = something::startsWith;
         String converted = converter.convert("java");
         System.out.println(converted);
     }
-
 
 
 }

@@ -10,12 +10,12 @@ class Base {
         System.out.println("Base block");
     }
 
-    public Base(){
+    public Base() {
         System.out.println("Base constructor");
     }
 }
 
-class Derived extends Base{
+class Derived extends Base {
     static {
         System.out.println("Derived static block");
     }
@@ -24,7 +24,7 @@ class Derived extends Base{
         System.out.println("Derived block");
     }
 
-    public Derived(){
+    public Derived() {
         System.out.println("Derived constructor");
     }
 

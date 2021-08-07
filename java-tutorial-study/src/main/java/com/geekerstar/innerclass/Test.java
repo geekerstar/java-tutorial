@@ -4,7 +4,7 @@ package com.geekerstar.innerclass;
  * @author geekerstar
  * date: 2019/3/10 19:56
  * description:
- *
+ * <p>
  * 匿名内部类
  * 1、匿名内部类一定是在new后面，这个匿名内部类必须继承一个父类或者实现一个接口
  * 2、匿名内部类不能有构造函数

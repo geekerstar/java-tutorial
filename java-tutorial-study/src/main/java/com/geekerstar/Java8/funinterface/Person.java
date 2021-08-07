@@ -4,7 +4,7 @@ package com.geekerstar.Java8.funinterface;
  * @author geekerstar
  * date: 2019-08-16 11:46
  * description:
- *
+ * <p>
  * ::关键字引用构造函数
  */
 public class Person {

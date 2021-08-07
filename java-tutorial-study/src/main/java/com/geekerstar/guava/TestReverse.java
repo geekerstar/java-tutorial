@@ -2,7 +2,6 @@ package com.geekerstar.guava;
 
 import cn.hutool.json.JSONUtil;
 import com.google.common.collect.Lists;
-import net.sf.json.JSON;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,8 +20,8 @@ public class TestReverse {
             add("30");
             add("40");
         }};
-        System.out.println("反转之前"+ JSONUtil.toJsonStr(list));
+        System.out.println("反转之前" + JSONUtil.toJsonStr(list));
         list = Lists.reverse(list);
-        System.out.println("反转之后"+ JSONUtil.toJsonStr(list));
+        System.out.println("反转之后" + JSONUtil.toJsonStr(list));
     }
 }

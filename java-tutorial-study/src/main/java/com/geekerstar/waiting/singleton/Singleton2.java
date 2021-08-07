@@ -27,15 +27,15 @@ public class Singleton2 {
     private static volatile Singleton2 singleton2 = null;
 
     // 私有化构造函数
-    private Singleton2(){
+    private Singleton2() {
 
     }
 
     // 提供对外方法
-    public static Singleton2 getInstance(){
-        if (singleton2 == null){
-            synchronized (Singleton2.class){
-                if (singleton2 == null){
+    public static Singleton2 getInstance() {
+        if (singleton2 == null) {
+            synchronized (Singleton2.class) {
+                if (singleton2 == null) {
                     singleton2 = new Singleton2();
                 }
             }

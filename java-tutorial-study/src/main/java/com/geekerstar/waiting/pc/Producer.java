@@ -9,7 +9,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * date: 2019-07-24 09:44
  * description:
  */
-public class Producer  implements Runnable{
+public class Producer implements Runnable {
 
     // true --> 生产者一直执行，false --> 停掉生产者
     private volatile boolean isRunning = true;
@@ -22,7 +22,7 @@ public class Producer  implements Runnable{
 
     private static AtomicInteger count = new AtomicInteger();
 
-    public Producer(Vector sharedQueue, int SIZE){
+    public Producer(Vector sharedQueue, int SIZE) {
         this.sharedQueue = sharedQueue;
         this.SIZE = SIZE;
     }
@@ -33,24 +33,24 @@ public class Producer  implements Runnable{
         Random r = new Random();
         System.out.println("start producer id =" + Thread.currentThread().getId());
         try {
-            while (isRunning){
+            while (isRunning) {
                 //模拟延迟
                 Thread.sleep(r.nextInt(1000));
 
                 // 当队列满时阻塞等待
-                while (sharedQueue.size() == SIZE){
-                    synchronized (sharedQueue){
-                        System.out.println("Queue is full,producer " + Thread.currentThread().getId() + " is wating, size:"+sharedQueue.size());
+                while (sharedQueue.size() == SIZE) {
+                    synchronized (sharedQueue) {
+                        System.out.println("Queue is full,producer " + Thread.currentThread().getId() + " is wating, size:" + sharedQueue.size());
                         sharedQueue.wait();
 
                     }
                 }
                 // 队列不满时持续创造新元素
-                synchronized (sharedQueue){
+                synchronized (sharedQueue) {
                     // 生产数据
                     data = count.incrementAndGet();
                     sharedQueue.add(data);
-                    System.out.println("producer create data:" + data + ",size:"+sharedQueue.size());
+                    System.out.println("producer create data:" + data + ",size:" + sharedQueue.size());
                     sharedQueue.notifyAll();
 
                 }
@@ -61,7 +61,7 @@ public class Producer  implements Runnable{
         }
     }
 
-    public void stop(){
+    public void stop() {
         isRunning = false;
     }
 }

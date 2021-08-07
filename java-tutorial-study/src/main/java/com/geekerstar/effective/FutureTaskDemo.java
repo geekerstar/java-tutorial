@@ -18,7 +18,7 @@ public class FutureTaskDemo {
             public String call() throws Exception {
                 Thread.sleep(3000);
                 // 返回一句话
-                return "我是子线程"+Thread.currentThread().getName();
+                return "我是子线程" + Thread.currentThread().getName();
             }
         });
         // 把任务提交到线程池中，线程池会分配线程帮我们执行任务
@@ -30,6 +30,6 @@ public class FutureTaskDemo {
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }
-        System.out.println("result is："+result);
+        System.out.println("result is：" + result);
     }
 }

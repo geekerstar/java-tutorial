@@ -2,10 +2,10 @@ package com.geekerstar.javabasic.jvm.model;
 
 public class StackLeakByThread {
     public static void main(String[] args) {
-        while (true){
+        while (true) {
             new Thread() {
-                public void run(){
-                    while (true){
+                public void run() {
+                    while (true) {
 
                     }
                 }

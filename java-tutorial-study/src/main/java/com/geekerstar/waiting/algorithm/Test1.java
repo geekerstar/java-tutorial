@@ -10,29 +10,30 @@ import java.util.concurrent.*;
  * @author geekerstar
  * date: 2019-07-24 08:01
  * description:
- *
+ * <p>
  * java程序，主进程需要等待多个子进程结束之后再执行后续的代码，有哪些方案可以实现？
- *
+ * <p>
  * 这个需求其实我们在工作中经常会用到，比如用户下单一个产品，后台会做一系列的处理，为了提高效率，每个处理都可以用一个线程来执行，所有处理完成了之后才会返回给用户下单成功
  */
 public class Test1 {
     /**
      * join方法
-     *
+     * <p>
      * 使用Thread的join()等待所有的子线程执行完毕，主线程在执行，thread.join()把指定的线程加入到当前线程，可以将两个交替执行的线程合并为顺序执行的线程。比如在线程B中调用了线程A的join()方法，直到线程A执行完毕后，才会继续执行线程B。
+     *
      * @param
      * @throws InterruptedException
      */
     @Test
-    public  void joinTest() throws InterruptedException {
+    public void joinTest() throws InterruptedException {
         Vector<Thread> vector = new Vector<>();
-        for(int i = 0; i < 5; i++){
+        for (int i = 0; i < 5; i++) {
             Thread childThread = new Thread(new Runnable() {
                 @Override
                 public void run() {
                     try {
                         Thread.sleep(1000);
-                    } catch (InterruptedException e){
+                    } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
                     System.out.println("子线程被执行");
@@ -41,7 +42,7 @@ public class Test1 {
             vector.add(childThread);
             childThread.start();
         }
-        for (Thread thread : vector){
+        for (Thread thread : vector) {
             thread.join();
         }
         System.out.println("主线程被执行");
@@ -50,7 +51,7 @@ public class Test1 {
 
     /**
      * 等待多线程完成的CountDownLatch
-     *
+     * <p>
      * CountDownLatch是一个同步工具类，用来协调多个线程之间的同步，或者说起到线程之间的通信（而不是用作互斥的作用）。
      * CountDownLatch能够使一个线程在等待另外一些线程完成各自工作之后，再继续执行。使用一个计数器进行实现。计数器初始值为线程的数量。当每一个线程完成自己任务后，计数器的值就会减一。当计数器的值为0时，表示所有的线程都已经完成了任务，然后在CountDownLatch上等待的线程就可以恢复执行任务。
      * CountDownLatch的用法
@@ -58,12 +59,11 @@ public class Test1 {
      * CountDownLatch典型用法2：实现多个线程开始执行任务的最大并行性。注意是并行性，不是并发，强调的是多个线程在某一时刻同时开始执行。类似于赛跑，将多个线程放到起点，等待发令枪响，然后同时开跑。做法是初始化一个共享的CountDownLatch(1)，将其计数器初始化为1，多个线程在开始执行任务前首先 coundownlatch.await()，当主线程调用 countDown() 时，计数器变为0，多个线程同时被唤醒。
      * CountDownLatch的不足
      * CountDownLatch是一次性的，计数器的值只能在构造方法中初始化一次，之后没有任何机制再次对其设置值，当CountDownLatch使用完毕后，它不能再次被使用。
-     *
      */
     @Test
     public void countDownLatchTest() throws InterruptedException {
         final CountDownLatch latch = new CountDownLatch(5);
-        for (int i = 0; i < 5; i++){
+        for (int i = 0; i < 5; i++) {
             Thread childThread = new Thread(new Runnable() {
                 @Override
                 public void run() {
@@ -87,7 +87,7 @@ public class Test1 {
 
     /**
      * 同步屏障CyclicBarrier
-     *
+     * <p>
      * 这里必须注意，CylicBarrier是控制一组线程的同步，初始化的参数：5的含义是包括主线程在内有5个线程，所以只能有四个子线程，这与CountDownLatch是不一样的。
      * countDownLatch和cyclicBarrier有什么区别呢，他们的区别：countDownLatch只能使用一次，而CyclicBarrier方法可以使用reset()方法重置，所以CyclicBarrier方法可以能处理更为复杂的业务场景。
      * 我曾经在网上看到一个关于countDownLatch和cyclicBarrier的形象比喻，就是在百米赛跑的比赛中若使用 countDownLatch的话冲过终点线一个人就给评委发送一个人的成绩，10个人比赛发送10次，如果用CyclicBarrier，则只在最后一个人冲过终点线的时候发送所有人的数据，仅仅发送一次，这就是区别。
@@ -95,7 +95,7 @@ public class Test1 {
     @Test
     public void cyclicBarrierTest() throws BrokenBarrierException, InterruptedException {
         final CyclicBarrier barrier = new CyclicBarrier(5);
-        for (int i = 0; i < 4; i++){
+        for (int i = 0; i < 4; i++) {
             Thread childThread = new Thread(new Runnable() {
                 @Override
                 public void run() {
@@ -125,7 +125,7 @@ public class Test1 {
 
     /**
      * yield方法（注意此种方法经过亲自试验证明并不可靠！）
-     *
+     * <p>
      * 为何yield方法会出现这样的问题？
      * 使当前线程从执行状态（运行状态）变为可执行态（就绪状态）。cpu会从众多的可执行态里选择，也就是说，当前也就是刚刚的那个线程还是有可能会被再次执行到的，并不是说一定会执行其他线程而该线程在下一次中不会执行到了。
      * Java线程中有一个Thread.yield( )方法，很多人翻译成线程让步。顾名思义，就是说当一个线程使用了这个方法之后，它就会把自己CPU执行的时间让掉，让自己或者其它的线程运行。
@@ -133,8 +133,8 @@ public class Test1 {
      * yield的本质是把当前线程重新置入抢CPU时间的”队列”(队列只是说所有线程都在一个起跑线上.并非真正意义上的队列)。
      */
     @Test
-    public void yieldTest(){
-        for (int i = 0; i < 5; i++){
+    public void yieldTest() {
+        for (int i = 0; i < 5; i++) {
             Thread childThread = new Thread(new Runnable() {
                 @Override
                 public void run() {
@@ -148,7 +148,7 @@ public class Test1 {
             });
             childThread.start();
         }
-        while (Thread.activeCount() > 2){
+        while (Thread.activeCount() > 2) {
             //保证前面的线程都执行完
             Thread.yield();
         }
@@ -160,7 +160,7 @@ public class Test1 {
      * FutureTask可用于闭锁，类似于CountDownLatch的作用
      */
     @Test
-    public void futureTaskTest(){
+    public void futureTaskTest() {
         MyThread myThread = new MyThread();
 
         //1、执行Callable方式，需要FutureTask的支持，用于接收运算结果
@@ -188,13 +188,13 @@ public class Test1 {
 
     }
 
-    class MyThread implements Callable<Integer>{
+    class MyThread implements Callable<Integer> {
 
         @Override
         public Integer call() throws Exception {
             int sum = 0;
             Thread.sleep(1000);
-            for (int i = 0; i < 10; i++){
+            for (int i = 0; i < 10; i++) {
                 sum += 1;
             }
             System.out.println("子线程被执行");
@@ -205,7 +205,7 @@ public class Test1 {
 
     /**
      * 使用callable+future
-     *
+     * <p>
      * Callable+Future最终也是以Callable+FutureTask的形式实现的。
      * 在这种方式中调用了： Future future = executor.submit(task);
      */
@@ -223,7 +223,7 @@ public class Test1 {
     }
 
 
-    class Task implements Callable<Integer>{
+    class Task implements Callable<Integer> {
 
         @Override
         public Integer call() throws Exception {

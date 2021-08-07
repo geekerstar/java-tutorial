@@ -1,7 +1,8 @@
 package com.geekerstar.javabasic.thread;
 
-public class CycleWait implements Runnable{
+public class CycleWait implements Runnable {
     private String value;
+
     public void run() {
         try {
             Thread.currentThread().sleep(5000);

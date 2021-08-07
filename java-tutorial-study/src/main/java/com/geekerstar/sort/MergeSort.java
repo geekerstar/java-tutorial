@@ -6,7 +6,7 @@ package com.geekerstar.sort;
  * description:
  */
 public class MergeSort {
-    public static void main(String[] args){
+    public static void main(String[] args) {
         int[] arrays = {9, 2, 5, 1, 3, 2, 9, 5, 2, 1, 8};
         mergeSort(arrays, 0, arrays.length - 1);
 
@@ -22,7 +22,7 @@ public class MergeSort {
      * @param L      指向数组第一个元素
      * @param R      指向数组最后一个元素
      */
-    public static void mergeSort(int[] arrays, int L, int R){
+    public static void mergeSort(int[] arrays, int L, int R) {
 
         //如果只有一个元素，那就不用排序了
         if (L == R) {
@@ -53,7 +53,7 @@ public class MergeSort {
      * @param M      指向数组分隔的元素
      * @param R      指向数组最后的元素
      */
-    public static void merge(int[] arrays, int L, int M, int R){
+    public static void merge(int[] arrays, int L, int M, int R) {
 
         //左边的数组的大小
         int[] leftArray = new int[M - L];
@@ -72,7 +72,7 @@ public class MergeSort {
 
         int i = 0, j = 0;
         // arrays数组的第一个元素
-        int  k = L;
+        int k = L;
 
 
         //比较这两个数组的值，哪个小，就往数组上放

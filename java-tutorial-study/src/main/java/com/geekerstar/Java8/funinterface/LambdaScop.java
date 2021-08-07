@@ -13,7 +13,7 @@ public class LambdaScop {
          * 我们可以访问lambda表达式外部的final局部变量：
          */
         final int num = 1;
-        Converter<Integer,String> stringConverter = (from) -> String.valueOf(from+num);
+        Converter<Integer, String> stringConverter = (from) -> String.valueOf(from + num);
         System.out.println(stringConverter.convert(2));
 
     }

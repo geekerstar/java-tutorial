@@ -17,9 +17,9 @@ public class TestMapsDifference {
         Map<String, String> leftMap = ImmutableMap.of("1", "1", "2", "2", "3", "3");
         Map<String, String> rightMap = ImmutableMap.of("2", "2", "3", "30", "4", "4");
         MapDifference difference = Maps.difference(leftMap, rightMap);
-        System.out.println("左边 map 独有 key："+difference.entriesOnlyOnLeft());
-        System.out.println("右边 map 独有 key："+difference.entriesOnlyOnRight());
-        System.out.println("左右边 map 都有 key，并且 value 相等："+difference.entriesInCommon());
-        System.out.println("左右边 map 都有 key，但 value 不等："+difference.entriesDiffering());
+        System.out.println("左边 map 独有 key：" + difference.entriesOnlyOnLeft());
+        System.out.println("右边 map 独有 key：" + difference.entriesOnlyOnRight());
+        System.out.println("左右边 map 都有 key，并且 value 相等：" + difference.entriesInCommon());
+        System.out.println("左右边 map 都有 key，但 value 不等：" + difference.entriesDiffering());
     }
 }

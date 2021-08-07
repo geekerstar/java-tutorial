@@ -56,7 +56,9 @@ public class EntCoordSyncJob {
                 json.append(inputLine);
             }
             in.close();
-        } catch (MalformedURLException e) {} catch (IOException e) {}
+        } catch (MalformedURLException e) {
+        } catch (IOException e) {
+        }
         return json.toString();
     }
 

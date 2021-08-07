@@ -6,7 +6,7 @@ package com.geekerstar.sort;
  * description:
  */
 public class RadisSort {
-    public static void main(String[] args){
+    public static void main(String[] args) {
 
         int[] arrays = {6, 4322, 432, 344, 55, 234, 45, 243, 5, 2, 4, 5, 6, 7, 3245, 345, 345, 234, 68, 65};
 
@@ -16,7 +16,7 @@ public class RadisSort {
 
     }
 
-    public static void radixSort(int[] arrays){
+    public static void radixSort(int[] arrays) {
 
         int max = findMax(arrays, 0, arrays.length - 1);
 
@@ -40,7 +40,7 @@ public class RadisSort {
             //有10个桶子
             for (int j = 0; j < 10; j++) {
                 //对每个桶子里的元素进行回收
-                for (int l = 0; l < arrays.length ; l++) {
+                for (int l = 0; l < arrays.length; l++) {
 
                     //如果桶子里面有元素就回收(数据初始化会为0)
                     if (buckets[l][j] != 0) {
@@ -65,7 +65,7 @@ public class RadisSort {
      * @return
      */
 
-    public static int findMax(int[] arrays, int L, int R){
+    public static int findMax(int[] arrays, int L, int R) {
 
         //如果该数组只有一个数，那么最大的就是该数组第一个值了
         if (L == R) {

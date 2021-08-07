@@ -9,7 +9,7 @@ public class ThreadPoolDemo {
     public static void main(String[] args) {
         ExecutorService newCachedThreadPool = Executors.newCachedThreadPool();
         Future<String> future = newCachedThreadPool.submit(new MyCallable());
-        if(!future.isDone()){
+        if (!future.isDone()) {
             System.out.println("task has not finished, please wait!");
         }
         try {

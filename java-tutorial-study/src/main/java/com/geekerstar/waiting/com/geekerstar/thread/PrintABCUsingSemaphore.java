@@ -6,7 +6,7 @@ import java.util.concurrent.Semaphore;
  * @author geekerstar
  * date: 2019-07-24 09:34
  * description:
- *
+ * <p>
  * 三个线程分别打印A，B，C，要求这三个线程一起运行，打印n次，输出形如“ABCABCABC….”的字符串。
  */
 public class PrintABCUsingSemaphore {
@@ -15,7 +15,7 @@ public class PrintABCUsingSemaphore {
     private Semaphore semaphoreB = new Semaphore(0);
     private Semaphore semaphoreC = new Semaphore(0);
 
-    public PrintABCUsingSemaphore(int times){
+    public PrintABCUsingSemaphore(int times) {
         this.times = times;
     }
 
@@ -29,32 +29,32 @@ public class PrintABCUsingSemaphore {
         new Thread(printABC::printC).start();
     }
 
-    public void printA(){
+    public void printA() {
         try {
-            print("A",semaphoreA,semaphoreB);
-        }catch (InterruptedException e){
+            print("A", semaphoreA, semaphoreB);
+        } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }
 
-    public void printB(){
+    public void printB() {
         try {
-            print("B",semaphoreB,semaphoreC);
-        }catch (InterruptedException e){
+            print("B", semaphoreB, semaphoreC);
+        } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }
 
-    public void printC(){
+    public void printC() {
         try {
-            print("C",semaphoreC,semaphoreA);
-        }catch (InterruptedException e){
+            print("C", semaphoreC, semaphoreA);
+        } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }
 
-    private void print(String name,Semaphore current,Semaphore next) throws InterruptedException {
-        for (int i = 0; i < times; i++){
+    private void print(String name, Semaphore current, Semaphore next) throws InterruptedException {
+        for (int i = 0; i < times; i++) {
             current.acquire();
             System.out.print(name);
             next.release();

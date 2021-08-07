@@ -6,6 +6,6 @@ package com.geekerstar.Java8.funinterface;
  * description:
  */
 @FunctionalInterface
-interface Converter<F,T> {
+interface Converter<F, T> {
     T convert(F from);
 }

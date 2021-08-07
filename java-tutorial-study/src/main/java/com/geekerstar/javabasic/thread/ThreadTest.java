@@ -7,8 +7,8 @@ public class ThreadTest {
     }
 
     public static void main(String[] args) throws InterruptedException {
-        Thread t = new Thread(){
-            public void run(){
+        Thread t = new Thread() {
+            public void run() {
                 attack();
             }
         };

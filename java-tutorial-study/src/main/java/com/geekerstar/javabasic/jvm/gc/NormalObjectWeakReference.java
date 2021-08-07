@@ -10,8 +10,9 @@ public class NormalObjectWeakReference extends WeakReference<NormalObject> {
         super(normalObject, rq);
         this.name = normalObject.name;
     }
+
     @Override
-    protected void finalize(){
+    protected void finalize() {
         System.out.println("Finalizing NormalObjectWeakReference " + name);
     }
 }
