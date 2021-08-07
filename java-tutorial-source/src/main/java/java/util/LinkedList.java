@@ -120,7 +120,7 @@ public class LinkedList<E>
     }
 
 
-    // TODO 从头部追加
+    // 从头部追加
     private void linkFirst(E e) {
         //头节点赋值给临时变量
         final Node<E> f = first;
@@ -138,7 +138,7 @@ public class LinkedList<E>
         modCount++;
     }
 
-    // TODO 从尾部开始追加节点
+    // 从尾部开始追加节点
     void linkLast(E e) {
         // 把尾节点数据暂存
         final Node<E> l = last;
@@ -173,7 +173,6 @@ public class LinkedList<E>
         modCount++;
     }
 
-    // TODO 从头部删除
     //从头删除节点 f 是链表头节点
     private E unlinkFirst(Node<E> f) {
         // 拿出头节点的值，作为方法的返回值
@@ -576,7 +575,7 @@ public class LinkedList<E>
     /**
      * Returns the (non-null) Node at the specified element index.
      */
-    // TODO 根据搜索因为查询节点
+    // 根据搜索因为查询节点
     Node<E> node(int index) {
         // index 处于队列的前半部分，从头开始找
         if (index < (size >> 1)) {
@@ -883,7 +882,7 @@ public class LinkedList<E>
         return new ListItr(index);
     }
 
-    // TODO 双向迭代器
+    // 双向迭代器
     private class ListItr implements ListIterator<E> {
         private Node<E> lastReturned;//上一次 next 或者 previos 的节点
         private Node<E> next;//下一个节点
@@ -942,7 +941,6 @@ public class LinkedList<E>
             return nextIndex - 1;
         }
 
-        // TODO
         public void remove() {
             checkForComodification();
             // lastReturned 为空，说明没有执行 next 或者 previos，直接报错
@@ -998,7 +996,6 @@ public class LinkedList<E>
         }
     }
 
-    // TODO 组成
     private static class Node<E> {
         E item;// 节点值
         Node<E> next; // 指向的下一个节点

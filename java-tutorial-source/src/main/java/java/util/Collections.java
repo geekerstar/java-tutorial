@@ -664,7 +664,6 @@ public class Collections {
      * @throws NoSuchElementException if the collection is empty.
      * @see Comparable
      */
-    // TODO
     public static <T extends Object & Comparable<? super T>>
     T max(Collection<? extends T> coll) {
         Iterator<? extends T> i = coll.iterator();
@@ -1271,7 +1270,6 @@ public class Collections {
     /**
      * @serial include
      */
-    // TODO
     static class UnmodifiableList<E> extends UnmodifiableCollection<E>
                                   implements List<E> {
         private static final long serialVersionUID = -283967356065247728L;

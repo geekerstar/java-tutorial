@@ -1904,8 +1904,6 @@ public class Arrays {
     }
 
     // Like public version, but without range checks.
-    // a：我们要搜索的数组，fromIndex：从那里开始搜索，默认是0； toIndex：搜索到何时停止，默认是数组大小
-    // key：我们需要搜索的值 c：外部比较器
     private static int binarySearch0(int[] a, int fromIndex, int toIndex,
                                      int key) {
         int low = fromIndex;
@@ -2534,9 +2532,6 @@ public class Arrays {
     }
 
     // Like public version, but without range checks.
-    // a：我们要搜索的数组，fromIndex：从那里开始搜索，默认是0； toIndex：搜索到何时停止，默认是数组大小
-    // key：我们需要搜索的值 c：外部比较器
-    // TODO
     private static <T> int binarySearch0(T[] a, int fromIndex, int toIndex,
                                          T key, Comparator<? super T> c) {
         // 如果比较器 c 是空的，直接使用 key 默认的 compareTo 方法进行排序。
@@ -3675,7 +3670,6 @@ public class Arrays {
     // original 原始数组数据
     // from 拷贝起点
     // to 拷贝终点
-    // TODO
     public static char[] copyOfRange(char[] original, int from, int to) {
         // 需要拷贝的长度
         int newLength = to - from;

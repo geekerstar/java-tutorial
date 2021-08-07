@@ -169,7 +169,7 @@ public class ArrayList<E> extends AbstractList<E>
    * @param c the collection whose elements are to be placed into this list
    * @throws NullPointerException if the specified collection is null
    */
-  // TODO 指定初始数据初始化
+  //指定初始数据初始化
   public ArrayList(Collection<? extends E> c) {
     //elementData 是保存数组的容器，默认为 null
     elementData = c.toArray();
@@ -434,7 +434,7 @@ public class ArrayList<E> extends AbstractList<E>
   }
 
 
-  // TODO 新增
+
   public boolean add(E e) {
     //确保数组大小足够，不够需要扩容
     ensureCapacityInternal(size + 1);  // Increments modCount!!
@@ -485,7 +485,7 @@ public class ArrayList<E> extends AbstractList<E>
    * @return the element that was removed from the list
    * @throws IndexOutOfBoundsException {@inheritDoc}
    */
-  //TODO 根据数组下标去删除
+  //根据数组下标去删除
   public E remove(int index) {
     rangeCheck(index);
 
@@ -515,7 +515,7 @@ public class ArrayList<E> extends AbstractList<E>
    * @return <tt>true</tt> if this list contained the specified element
    */
 
-  // TODO 根据值去删除
+  // 根据值去删除
   public boolean remove(Object o) {
     // 如果值是空的，找到第一个值是空的删除
     if (o == null) {
