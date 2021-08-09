@@ -313,6 +313,13 @@ public class WeakHashMap<K,V>
 
     /**
      * Expunges stale entries from the table.
+     * WeakHashMap用来处理ReferenceQueue中被GC的key所关联的Entry相关数据。
+     * 通过从queue中poll出相关的Entry，然后去WeakHashMap的entry数组中找到索引，然后从对应的链中去掉相关的Entry，最后将value赋值为空（Help GC），到这里就完成了相关数据的清理。
+     * 谁来触发expungeStaleEntries方法呢？有多个方法都可以触发，如put、get、remove、size等方法都能够触发相关的逻辑。
+     * 如果没有触发expungeStaleEntries这个方法依然会导致内存泄漏。
+     * 比如初始化好WeakHashMap中相关数据后，一直不调用put、get、remove、size等相关方法，也是不能够正常回收的。
+     *
+     * 效果是 key 在 GC 的时候被清除，value 在 key 清除后，访问数组内容的时候进行清除！
      */
     private void expungeStaleEntries() {
         for (Object x; (x = queue.poll()) != null; ) {
@@ -392,12 +399,16 @@ public class WeakHashMap<K,V>
      * @see #put(Object, Object)
      */
     public V get(Object key) {
+        // get 方法在判断对象之前，也调用了getTable()函数，同时，也调用了expungeStaleEntries()函数，
+        // 所以，可能通过 key 获取元素的时候，得到空值；如果 key 没有被 GC 回收，那么就返回对应的 value。
         Object k = maskNull(key);
         int h = hash(k);
+        //访问数组内容
         Entry<K,V>[] tab = getTable();
         int index = indexFor(h, tab.length);
         Entry<K,V> e = tab[index];
         while (e != null) {
+            //通过key，进行hash值和equals判断
             if (e.hash == h && eq(k, e.get()))
                 return e.value;
             e = e.next;
@@ -587,18 +598,22 @@ public class WeakHashMap<K,V>
      *         <tt>null</tt> if there was no mapping for <tt>key</tt>
      */
     public V remove(Object key) {
+        // remove 方法在判断对象之前，也调用了getTable()函数，同时，也调用了expungeStaleEntries()函数，
+        // 所以，可能通过 key 获取元素的时候，可能被垃圾回收器回收，得到空值。
         Object k = maskNull(key);
         int h = hash(k);
+        //访问数组内容
         Entry<K,V>[] tab = getTable();
         int i = indexFor(h, tab.length);
         Entry<K,V> prev = tab[i];
         Entry<K,V> e = prev;
-
+        //循环链表，通过key，进行hash值和equals判断
         while (e != null) {
             Entry<K,V> next = e.next;
             if (h == e.hash && eq(k, e.get())) {
                 modCount++;
                 size--;
+                //找到之后，将链表后节点向前移动
                 if (prev == e)
                     tab[i] = next;
                 else
@@ -698,6 +713,7 @@ public class WeakHashMap<K,V>
     /**
      * The entries in this hash table extend WeakReference, using its main ref
      * field as the key.
+     * WeakHashMap的Entry是继承WeakReference，这样一来，整个Entry就是一个WeakReference。
      */
     private static class Entry<K,V> extends WeakReference<Object> implements Map.Entry<K,V> {
         V value;
@@ -706,10 +722,15 @@ public class WeakHashMap<K,V>
 
         /**
          * Creates new entry.
+         *
+         * Entry 中super(key, queue)，传入的是key，因此key才是进行弱引用的，value是直接强引用关联在this.value中，System.gc()时，对key进行了回收，而value依然保持。
          */
         Entry(Object key, V value,
               ReferenceQueue<Object> queue,
               int hash, Entry<K,V> next) {
+            // 这个key就是WeakHashMap中存储的key值，这个queue是WeakHashMap中创建的ReferenceQueue
+            // 当GC某个对象时，如果有此对象上还有弱引用与其关联，会将WeakReference对象与Reference类的pending引用关联起来，然后由Reference Handler线程将该插入ReferenceQueue队列
+            // 也就是说当Entry中的key被GC时，会将Entry放入到ReferenceQueue中，WeakHashMap就能个通过ReferenceQueue中的Entry了解到哪些key已经被GC，或者即将马上被GC，起到了通知的作用。
             super(key, queue);
             this.value = value;
             this.hash  = hash;
