@@ -94,15 +94,18 @@ public class TreeSet<E> extends AbstractSet<E>
 {
     /**
      * The backing map.
+     * 具体的实现类
      */
     private transient NavigableMap<E,Object> m;
 
     // Dummy value to associate with an Object in the backing Map
+    // Map的value
     private static final Object PRESENT = new Object();
 
     /**
      * Constructs a set backed by the specified navigable map.
      */
+    // 指定实现类型
     TreeSet(NavigableMap<E,Object> m) {
         this.m = m;
     }
@@ -120,6 +123,9 @@ public class TreeSet<E> extends AbstractSet<E>
      * integers), the {@code add} call will throw a
      * {@code ClassCastException}.
      */
+    // 默认采用TreeMap实现
+    // 如果我们没有指定传入的 Map 类型，TreeSet 将自动采用 TreeMap 来实现。
+    // 而如果你传入了 NavigableMap 类型的对象，那么就按照你传入的对象类型来实现。
     public TreeSet() {
         this(new TreeMap<E,Object>());
     }
@@ -137,6 +143,7 @@ public class TreeSet<E> extends AbstractSet<E>
      *        If {@code null}, the {@linkplain Comparable natural
      *        ordering} of the elements will be used.
      */
+    // 指定TreeMap的比较器
     public TreeSet(Comparator<? super E> comparator) {
         this(new TreeMap<>(comparator));
     }
@@ -155,6 +162,7 @@ public class TreeSet<E> extends AbstractSet<E>
      *         not {@link Comparable}, or are not mutually comparable
      * @throws NullPointerException if the specified collection is null
      */
+    // 指定初始集合
     public TreeSet(Collection<? extends E> c) {
         this();
         addAll(c);
@@ -167,6 +175,7 @@ public class TreeSet<E> extends AbstractSet<E>
      * @param s sorted set whose elements will comprise the new set
      * @throws NullPointerException if the specified sorted set is null
      */
+    // 指定比较器以及初始集合
     public TreeSet(SortedSet<E> s) {
         this(s.comparator());
         addAll(s);

@@ -113,13 +113,19 @@ import java.util.function.Consumer;
  * @see Collection
  * @since 1.2
  */
-
+// TreeMap 是 Map 集合的有序实现，其底层是基于红黑树的实现，能够早 log(n) 时间内完成 get、put 和 remove 操作。
+//1. 由于底层是红黑树，那么时间复杂度可以保证为log(n)
+//2. key不能为null，为null为抛出NullPointException的
+//3. 想要自定义比较，在构造方法中传入Comparator对象，否则使用key的自然排序来进行比较
+//4. TreeMap非同步的，想要同步可以使用Collections来进行封装
+   // https://mp.weixin.qq.com/s?__biz=MzI5NTYwNDQxNA==&mid=2247485206&idx=2&sn=84f5c245562a4e828a81e8ba3021417c&chksm=ec505ec7db27d7d105993aa7e4ee3e7455f3cd94dfea937dc1321f1d85ffc264a2f256f216c3&mpshare=1&scene=1&srcid=&sharer_sharetime=1564806217445&sharer_shareid=535c00d0d7095600f2fcdf96cc5a31ba#rd
+    // https://mp.weixin.qq.com/s?__biz=MzI5NTYwNDQxNA==&mid=2247485206&idx=3&sn=2b6385feac126238d6607b762832f4e3&chksm=ec505ec7db27d7d1cd967fd77cc0cad0cfd048268906f1d6e92ce0cc26f4aaa15a403573725e&mpshare=1&scene=1&srcid=&sharer_sharetime=1564806220893&sharer_shareid=535c00d0d7095600f2fcdf96cc5a31ba#rd
 public class TreeMap<K,V>
     extends AbstractMap<K,V>
     implements NavigableMap<K,V>, Cloneable, java.io.Serializable
 {
     //比较器，如果外部有传进来 Comparator 比较器，首先用外部的
-    //如果外部比较器为空，则使用 key 自己的 Comparable 的 compareTo 方法
+    //如果外部比较器为空，则使用 key 自己的 Comparable 的 compareTo 方法。表示按照key做自然排序（最小的在根节点）。
     private final Comparator<? super K> comparator;
     //红黑树的根节点
     private transient Entry<K,V> root;
@@ -419,6 +425,7 @@ public class TreeMap<K,V>
             Comparable<? super K> k = (Comparable<? super K>) key;
         //通过简单的查询红黑树查找到
         Entry<K,V> p = root;
+        // 核心查找逻辑
         while (p != null) {
             int cmp = k.compareTo(p.key);
             if (cmp < 0)
@@ -692,13 +699,22 @@ public class TreeMap<K,V>
      *         and this map uses natural ordering, or its comparator
      *         does not permit null keys
      */
+    //（1）如果删除的位置有两个叶子节点，则从其右子树中取最小的元素放到删除的位置，然后把删除位置移到替代元素的位置，进入下一步。
+    //（2）如果删除的位置只有一个叶子节点（有可能是经过第一步转换后的删除位置），则把那个叶子节点作为替代元素，放到删除的位置，然后把这个叶子节点删除。
+    //（3）如果删除的位置没有叶子节点，则直接把这个删除位置的元素删除即可。
+    //（4）针对红黑树，如果删除位置是黑色节点，还需要做再平衡。
+    //（5）如果有替代元素，则以替代元素作为当前节点进入再平衡。
+    //（6）如果没有替代元素，则以删除的位置的元素作为当前节点进入再平衡，平衡之后再删除这个节点。
     public V remove(Object key) {
+        // 获取节点
         Entry<K,V> p = getEntry(key);
         if (p == null)
             return null;
 
         V oldValue = p.value;
+        // 删除节点
         deleteEntry(p);
+        // 返回删除的value
         return oldValue;
     }
 
@@ -2322,11 +2338,15 @@ public class TreeMap<K,V>
      * Delete node p, and then rebalance the tree.
      */
     private void deleteEntry(Entry<K,V> p) {
+        // 修改次数加1
         modCount++;
+        // 元素个数减1
         size--;
 
         // If strictly internal, copy successor's element to p and then make p
         // point to successor.
+        // 1. 如果 p 有两个孩子节点，则找到后继节点，
+        // 并把后继节点的值复制到节点 P 中，并让 p 指向其后继节点
         if (p.left != null && p.right != null) {
             Entry<K,V> s = successor(p);
             p.key = s.key;
@@ -2338,6 +2358,7 @@ public class TreeMap<K,V>
         Entry<K,V> replacement = (p.left != null ? p.left : p.right);
 
         if (replacement != null) {
+            //  2. 将 replacement parent 引用指向新的父节点，同时让新的父节点指向 replacement。
             // Link replacement to parent
             replacement.parent = p.parent;
             if (p.parent == null)
@@ -2351,14 +2372,18 @@ public class TreeMap<K,V>
             p.left = p.right = p.parent = null;
 
             // Fix replacement
+            // 3. 如果删除的节点 p 是黑色节点，则需要进行调整
             if (p.color == BLACK)
                 fixAfterDeletion(replacement);
         } else if (p.parent == null) { // return if we are the only node.
+            // 删除的是根节点，且树中当前只有一个节点
             root = null;
         } else { //  No children. Use self as phantom replacement and unlink.
+            // 删除的节点没有孩子节点
+            // p 是黑色，则需要进行调整
             if (p.color == BLACK)
                 fixAfterDeletion(p);
-
+            // 将 P 从树中移除
             if (p.parent != null) {
                 if (p == p.parent.left)
                     p.parent.left = null;
