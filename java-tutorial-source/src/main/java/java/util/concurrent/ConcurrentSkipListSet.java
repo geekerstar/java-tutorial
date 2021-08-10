@@ -91,8 +91,19 @@ import java.util.Spliterator;
  * @param <E> the type of elements maintained by this set
  * @since 1.6
  */
+
+/**
+ * ConcurrentSkipListSet底层是通过ConcurrentNavigableMap来实现的，它是一个有序的线程安全的集合。
+ * ConcurrentSkipListSet基本上都是使用ConcurrentSkipListMap实现的，虽然取子set部分是使用ConcurrentSkipListMap中的内部类，但是这些内部类其实也是和ConcurrentSkipListMap相关的，它们返回ConcurrentSkipListMap的一部分数据。
+ * （1）ConcurrentSkipListSet底层是使用ConcurrentNavigableMap实现的；
+ * （2）ConcurrentSkipListSet有序的，基于元素的自然排序或者通过比较器确定的顺序；
+ * （3）ConcurrentSkipListSet是线程安全的；
+ *
+ * https://mp.weixin.qq.com/s?__biz=MzI5NTYwNDQxNA==&mid=2247485301&idx=2&sn=18f51de5ac7fcf0e9f58804ac24e881a&chksm=ec505ea4db27d7b2dc39810ddcd40602aa71304271e2bd950d2ebb80a91fbaaedd90fc11b2c4&mpshare=1&scene=1&srcid=&sharer_sharetime=1566771989327&sharer_shareid=535c00d0d7095600f2fcdf96cc5a31ba#rd
+ */
 public class ConcurrentSkipListSet<E>
     extends AbstractSet<E>
+    // 实现了NavigableSet接口，并没有所谓的ConcurrentNavigableSet接口
     implements NavigableSet<E>, Cloneable, java.io.Serializable {
 
     private static final long serialVersionUID = -2479143111061671589L;
@@ -102,12 +113,14 @@ public class ConcurrentSkipListSet<E>
      * element.  This field is declared final for the sake of thread
      * safety, which entails some ugliness in clone().
      */
+    // 存储使用的map
     private final ConcurrentNavigableMap<E,Object> m;
 
     /**
      * Constructs a new, empty set that orders its elements according to
      * their {@linkplain Comparable natural ordering}.
      */
+    // 初始化
     public ConcurrentSkipListSet() {
         m = new ConcurrentSkipListMap<E,Object>();
     }
@@ -120,6 +133,7 @@ public class ConcurrentSkipListSet<E>
      *        If {@code null}, the {@linkplain Comparable natural
      *        ordering} of the elements will be used.
      */
+    // 传入比较器
     public ConcurrentSkipListSet(Comparator<? super E> comparator) {
         m = new ConcurrentSkipListMap<E,Object>(comparator);
     }
@@ -135,6 +149,8 @@ public class ConcurrentSkipListSet<E>
      * @throws NullPointerException if the specified collection or any
      *         of its elements are null
      */
+    // 使用ConcurrentSkipListMap初始化map
+    // 并将集合c中所有元素放入到map中
     public ConcurrentSkipListSet(Collection<? extends E> c) {
         m = new ConcurrentSkipListMap<E,Object>();
         addAll(c);
@@ -148,6 +164,8 @@ public class ConcurrentSkipListSet<E>
      * @throws NullPointerException if the specified sorted set or any
      *         of its elements are null
      */
+    // 使用ConcurrentSkipListMap初始化map
+    // 并将有序Set中所有元素放入到map中
     public ConcurrentSkipListSet(SortedSet<E> s) {
         m = new ConcurrentSkipListMap<E,Object>(s.comparator());
         addAll(s);
@@ -156,6 +174,7 @@ public class ConcurrentSkipListSet<E>
     /**
      * For use by submaps
      */
+    // ConcurrentSkipListSet类内部返回子set时使用的
     ConcurrentSkipListSet(ConcurrentNavigableMap<E,Object> m) {
         this.m = m;
     }
@@ -166,6 +185,7 @@ public class ConcurrentSkipListSet<E>
      *
      * @return a shallow copy of this set
      */
+    // 克隆方法
     public ConcurrentSkipListSet<E> clone() {
         try {
             @SuppressWarnings("unchecked")
@@ -196,6 +216,7 @@ public class ConcurrentSkipListSet<E>
      *
      * @return the number of elements in this set
      */
+    // 返回元素个数
     public int size() {
         return m.size();
     }
@@ -204,6 +225,7 @@ public class ConcurrentSkipListSet<E>
      * Returns {@code true} if this set contains no elements.
      * @return {@code true} if this set contains no elements
      */
+    // 检查是否为空
     public boolean isEmpty() {
         return m.isEmpty();
     }
@@ -219,6 +241,7 @@ public class ConcurrentSkipListSet<E>
      *         compared with the elements currently in this set
      * @throws NullPointerException if the specified element is null
      */
+    // 检查是否包含某个元素
     public boolean contains(Object o) {
         return m.containsKey(o);
     }
@@ -237,6 +260,8 @@ public class ConcurrentSkipListSet<E>
      *         with the elements currently in this set
      * @throws NullPointerException if the specified element is null
      */
+    // 添加一个元素
+    // 调用map的putIfAbsent()方法
     public boolean add(E e) {
         return m.putIfAbsent(e, Boolean.TRUE) == null;
     }
@@ -255,6 +280,7 @@ public class ConcurrentSkipListSet<E>
      *         with the elements currently in this set
      * @throws NullPointerException if the specified element is null
      */
+    // 移除一个元素
     public boolean remove(Object o) {
         return m.remove(o, Boolean.TRUE);
     }
@@ -262,6 +288,7 @@ public class ConcurrentSkipListSet<E>
     /**
      * Removes all of the elements from this set.
      */
+    // 清空所有元素
     public void clear() {
         m.clear();
     }
@@ -271,6 +298,7 @@ public class ConcurrentSkipListSet<E>
      *
      * @return an iterator over the elements in this set in ascending order
      */
+    // 迭代器
     public Iterator<E> iterator() {
         return m.navigableKeySet().iterator();
     }
@@ -280,6 +308,7 @@ public class ConcurrentSkipListSet<E>
      *
      * @return an iterator over the elements in this set in descending order
      */
+    // 降序迭代器
     public Iterator<E> descendingIterator() {
         return m.descendingKeySet().iterator();
     }
@@ -299,6 +328,7 @@ public class ConcurrentSkipListSet<E>
      * @param o the object to be compared for equality with this set
      * @return {@code true} if the specified object is equal to this set
      */
+    // 比较相等方法
     public boolean equals(Object o) {
         // Override AbstractSet version to avoid calling size()
         if (o == this)
@@ -307,6 +337,8 @@ public class ConcurrentSkipListSet<E>
             return false;
         Collection<?> c = (Collection<?>) o;
         try {
+            // 这里是通过两次两层for循环来比较
+            // 这里是有很大优化空间的
             return containsAll(c) && c.containsAll(this);
         } catch (ClassCastException unused) {
             return false;
@@ -328,6 +360,7 @@ public class ConcurrentSkipListSet<E>
      * @throws NullPointerException if the specified collection or any
      *         of its elements are null
      */
+    // 移除集合c中所有元素
     public boolean removeAll(Collection<?> c) {
         // Override AbstractSet version to avoid unnecessary call to size()
         boolean modified = false;
@@ -343,6 +376,7 @@ public class ConcurrentSkipListSet<E>
      * @throws ClassCastException {@inheritDoc}
      * @throws NullPointerException if the specified element is null
      */
+    // 小于e的最大元素
     public E lower(E e) {
         return m.lowerKey(e);
     }
@@ -351,6 +385,7 @@ public class ConcurrentSkipListSet<E>
      * @throws ClassCastException {@inheritDoc}
      * @throws NullPointerException if the specified element is null
      */
+    // 小于等于e的最大元素
     public E floor(E e) {
         return m.floorKey(e);
     }
@@ -359,6 +394,7 @@ public class ConcurrentSkipListSet<E>
      * @throws ClassCastException {@inheritDoc}
      * @throws NullPointerException if the specified element is null
      */
+    // 大于等于e的最小元素
     public E ceiling(E e) {
         return m.ceilingKey(e);
     }
@@ -367,15 +403,18 @@ public class ConcurrentSkipListSet<E>
      * @throws ClassCastException {@inheritDoc}
      * @throws NullPointerException if the specified element is null
      */
+    // 大于e的最小元素
     public E higher(E e) {
         return m.higherKey(e);
     }
 
+    // 弹出最小的元素
     public E pollFirst() {
         Map.Entry<E,Object> e = m.pollFirstEntry();
         return (e == null) ? null : e.getKey();
     }
 
+    // 弹出最大的元素
     public E pollLast() {
         Map.Entry<E,Object> e = m.pollLastEntry();
         return (e == null) ? null : e.getKey();
@@ -385,6 +424,7 @@ public class ConcurrentSkipListSet<E>
     /* ---------------- SortedSet operations -------------- */
 
 
+    // 取比较器
     public Comparator<? super E> comparator() {
         return m.comparator();
     }
@@ -392,6 +432,7 @@ public class ConcurrentSkipListSet<E>
     /**
      * @throws java.util.NoSuchElementException {@inheritDoc}
      */
+    // 最小的元素
     public E first() {
         return m.firstKey();
     }
@@ -399,6 +440,7 @@ public class ConcurrentSkipListSet<E>
     /**
      * @throws java.util.NoSuchElementException {@inheritDoc}
      */
+    // 最大的元素
     public E last() {
         return m.lastKey();
     }
@@ -409,6 +451,7 @@ public class ConcurrentSkipListSet<E>
      *         {@code toElement} is null
      * @throws IllegalArgumentException {@inheritDoc}
      */
+    // 取两个元素之间的子set
     public NavigableSet<E> subSet(E fromElement,
                                   boolean fromInclusive,
                                   E toElement,
@@ -423,6 +466,7 @@ public class ConcurrentSkipListSet<E>
      * @throws NullPointerException if {@code toElement} is null
      * @throws IllegalArgumentException {@inheritDoc}
      */
+    // 取头子set
     public NavigableSet<E> headSet(E toElement, boolean inclusive) {
         return new ConcurrentSkipListSet<E>(m.headMap(toElement, inclusive));
     }
@@ -432,6 +476,7 @@ public class ConcurrentSkipListSet<E>
      * @throws NullPointerException if {@code fromElement} is null
      * @throws IllegalArgumentException {@inheritDoc}
      */
+    // 取尾子set
     public NavigableSet<E> tailSet(E fromElement, boolean inclusive) {
         return new ConcurrentSkipListSet<E>(m.tailMap(fromElement, inclusive));
     }
@@ -442,6 +487,7 @@ public class ConcurrentSkipListSet<E>
      *         {@code toElement} is null
      * @throws IllegalArgumentException {@inheritDoc}
      */
+    // 取子set，包含from，不包含to
     public NavigableSet<E> subSet(E fromElement, E toElement) {
         return subSet(fromElement, true, toElement, false);
     }
@@ -451,6 +497,7 @@ public class ConcurrentSkipListSet<E>
      * @throws NullPointerException if {@code toElement} is null
      * @throws IllegalArgumentException {@inheritDoc}
      */
+    // 取头子set，不包含to
     public NavigableSet<E> headSet(E toElement) {
         return headSet(toElement, false);
     }
@@ -460,6 +507,7 @@ public class ConcurrentSkipListSet<E>
      * @throws NullPointerException if {@code fromElement} is null
      * @throws IllegalArgumentException {@inheritDoc}
      */
+    // 取尾子set，包含from
     public NavigableSet<E> tailSet(E fromElement) {
         return tailSet(fromElement, true);
     }
@@ -476,6 +524,7 @@ public class ConcurrentSkipListSet<E>
      *
      * @return a reverse order view of this set
      */
+    // 降序set
     public NavigableSet<E> descendingSet() {
         return new ConcurrentSkipListSet<E>(m.descendingMap());
     }
@@ -499,6 +548,7 @@ public class ConcurrentSkipListSet<E>
      * @since 1.8
      */
     @SuppressWarnings("unchecked")
+    // 可分割的迭代器
     public Spliterator<E> spliterator() {
         if (m instanceof ConcurrentSkipListMap)
             return ((ConcurrentSkipListMap<E,?>)m).keySpliterator();
@@ -507,10 +557,13 @@ public class ConcurrentSkipListSet<E>
     }
 
     // Support for resetting map in clone
+    // 原子更新map，给clone方法使用
     private void setMap(ConcurrentNavigableMap<E,Object> map) {
         UNSAFE.putObjectVolatile(this, mapOffset, map);
     }
 
+
+    // 原子操作相关内容
     private static final sun.misc.Unsafe UNSAFE;
     private static final long mapOffset;
     static {
