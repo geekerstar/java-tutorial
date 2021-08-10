@@ -162,6 +162,29 @@ import java.io.IOException;
  * @see     Hashtable
  * @since   1.4
  */
+
+/**
+ * LinkedHashMap内部维护了一个双向链表，能保证元素按插入的顺序访问，也能以访问顺序访问，可以用来实现LRU缓存策略。
+ * LinkedHashMap可以看成是 LinkedList + HashMap。
+ * 添加删除元素的时候需要同时维护在HashMap中的存储，也要维护在LinkedList中的存储，所以性能上来说会比HashMap稍慢。
+ *
+ * （1）LinkedHashMap继承自HashMap，具有HashMap的所有特性；
+ * （2）LinkedHashMap内部维护了一个双向链表存储所有的元素；
+ * （3）如果accessOrder为false，则可以按插入元素的顺序遍历元素；
+ * （4）如果accessOrder为true，则可以按访问元素的顺序遍历元素；
+ * （5）LinkedHashMap的实现非常精妙，很多方法都是在HashMap中留的钩子（Hook），直接实现这些Hook就可以实现对应的功能了，并不需要再重写put()等方法；
+ * （6）默认的LinkedHashMap并不会移除旧元素，如果需要移除旧元素，则需要重写removeEldestEntry()方法设定移除策略；
+ * （7）LinkedHashMap可以用来实现LRU缓存淘汰策略；
+ *
+ * LinkedHashMap 继承自 HashMap，所有大部分功能特性基本相同，二者唯一的区别是 LinkedHashMap 在 HashMap 的基础上，采用双向链表（doubly-linked list）的形式将所有 entry 连接起来，这样是为保证元素的迭代顺序跟插入顺序相同。
+ * 主体部分跟 HashMap 完全一样，多了 header 指向双向链表的头部，tail 指向双向链表的尾部，默认双向链表的迭代顺序就是 entry 的插入顺序。
+ *
+ * https://blog.csdn.net/tangtong1/article/details/88958299
+ *
+ * https://mp.weixin.qq.com/s?__biz=MzIwMTY0NDU3Nw==&mid=2651940838&idx=2&sn=bca63e618360ff94a8b5597b0930ed72&chksm=8d0f08a8ba7881be3d7085021906bad88981e9ee0f5d272359f784a9ab167638f14d18bf9550&mpshare=1&scene=1&srcid=&sharer_sharetime=1574570483894&sharer_shareid=535c00d0d7095600f2fcdf96cc5a31ba#rd
+ *
+ * https://mp.weixin.qq.com/s?__biz=MzI4Njg5MDA5NA==&mid=2247484143&idx=1&sn=8d94f92f26b87dcea9181a04c78a9743&chksm=ebd743eedca0caf84ede91e6cd295664f92d2b167068d4c4a15f8cb4002844b819378f1e8e3d&mpshare=1&scene=1&srcid=10234T9Jwn1Wuf99of46S8JX#rd
+ */
 public class LinkedHashMap<K,V>
     extends HashMap<K,V>
     implements Map<K,V>
@@ -193,6 +216,7 @@ public class LinkedHashMap<K,V>
     /**
      * HashMap.Node subclass for normal LinkedHashMap entries.
      */
+    // 存储节点，继承自HashMap的Node类，next用于单链表存储于桶中，before和after用于双向链表存储所有元素。
     static class Entry<K,V> extends HashMap.Node<K,V> {
         Entry<K,V> before, after;
         Entry(int hash, K key, V value, Node<K,V> next) {
@@ -200,12 +224,13 @@ public class LinkedHashMap<K,V>
         }
     }
 
-    // 双向链表头
+    // 双向链表头,旧数据存在头节点。
     transient LinkedHashMap.Entry<K,V> head;
 
-    // 双向链表尾
+    // 双向链表尾,新数据存在尾节点。
     transient LinkedHashMap.Entry<K,V> tail;
 
+    // 是否按访问顺序排序
     // true 按照访问顺序
     // false 按照插入顺序 默认 false
     final boolean accessOrder;
@@ -282,9 +307,11 @@ public class LinkedHashMap<K,V>
         return t;
     }
 
+    // 在节点被删除之后调用的方法。
     void afterNodeRemoval(Node<K,V> e) { // unlink
         LinkedHashMap.Entry<K,V> p =
             (LinkedHashMap.Entry<K,V>)e, b = p.before, a = p.after;
+        // 把节点p从双向链表中删除。
         p.before = p.after = null;
         if (b == null)
             head = a;
@@ -297,7 +324,11 @@ public class LinkedHashMap<K,V>
     }
 
 
+    //（1）如果accessOrder为true，并且访问的节点不是尾节点；
+    //（2）从双向链表中移除访问的节点；
+    //（3）把访问的节点加到双向链表的末尾；（末尾为最新访问的元素）
 
+    // 在节点访问之后被调用，主要在put()已经存在的元素或get()时被调用，如果accessOrder为true，调用这个方法把访问到的节点移动到双向链表的末尾。
     // 节点移动到队尾
     void afterNodeAccess(Node<K,V> e) { // move node to last
         LinkedHashMap.Entry<K,V> last;
@@ -305,6 +336,7 @@ public class LinkedHashMap<K,V>
         if (accessOrder && (last = tail) != e) {
             LinkedHashMap.Entry<K,V> p =
                 (LinkedHashMap.Entry<K,V>)e, b = p.before, a = p.after;
+            // 把p节点从双向链表中移除
             p.after = null;
             if (b == null)
                 head = a;
@@ -314,17 +346,23 @@ public class LinkedHashMap<K,V>
                 a.before = b;
             else
                 last = b;
+            // 把p节点放到双向链表的末尾
             if (last == null)
                 head = p;
             else {
                 p.before = last;
                 last.after = p;
             }
+            // 尾节点等于p
             tail = p;
             ++modCount;
         }
     }
 
+    // （1）如果evict为true，且头节点不为空，且确定移除最老的元素，那么就调用HashMap.removeNode()把头节点移除（这里的头节点是双向链表的头节点，而不是某个桶中的第一个元素）；
+    //（2）HashMap.removeNode()从HashMap中把这个节点移除之后，会调用afterNodeRemoval()方法；
+    //（3）afterNodeRemoval()方法在LinkedHashMap中也有实现，用来在移除元素后修改双向链表，见下文；
+    //（4）默认removeEldestEntry()方法返回false，也就是不删除元素。
     // 删除不经常使用的元素
     void afterNodeInsertion(boolean evict) { // possibly remove eldest
         // 得到元素头节点
@@ -405,6 +443,7 @@ public class LinkedHashMap<K,V>
      * @throws IllegalArgumentException if the initial capacity is negative
      *         or the load factor is nonpositive
      */
+    // LRU缓存策略的关键
     public LinkedHashMap(int initialCapacity,
                          float loadFactor,
                          boolean accessOrder) {
@@ -445,6 +484,7 @@ public class LinkedHashMap<K,V>
      * The {@link #containsKey containsKey} operation may be used to
      * distinguish these two cases.
      */
+    // 如果查找到了元素，且accessOrder为true，则调用afterNodeAccess()方法把访问的节点移到双向链表的末尾。
     public V get(Object key) {
         Node<K,V> e;
         // 调用 HashMap  get 方法
