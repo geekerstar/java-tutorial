@@ -80,10 +80,28 @@ import java.util.function.Consumer;
  * @param <E> the type of elements held in this collection
  */
 
+/**
+ * LinkedList在头尾查找、插入性能都是很棒的，但是在中间位置进行操作的话，性能就差很远了
+ * ArrayList的查找性能绝对是一流的，无论查询的是哪个位置的元素
+ *
+ * 顺序表：需要申请连续的内存空间保存元素，可以通过内存中的物理位置直接找到元素的逻辑位置。在顺序表中间插入or删除元素需要把该元素之后的所有元素向前or向后移动。
+ * 双向链表：不需要申请连续的内存空间保存元素，需要通过元素的头尾指针找到前继与后继元素（查找元素的时候需要从头or尾开始遍历整个链表，直到找到目标元素）。在双向链表中插入or删除元素不需要移动元素，只需要改变相关元素的头尾指针即可。
+ *
+ * 对于LinkedList来说，头部插入和尾部插入时间复杂度都是O(1)
+ * 但是对于ArrayList来说，头部的每一次插入都需要移动size-1个元素，效率可想而知
+ * 但是如果都是在最中间的位置插入的话，ArrayList速度比LinkedList的速度快将近10倍
+ *
+ * https://mp.weixin.qq.com/s?__biz=MzI4Njc5NjM1NQ==&mid=2247487599&idx=1&sn=7b7b1694929079f3d30a380853b5eb8c&chksm=ebd62f43dca1a655f651eda28672df5ae05b3738eed1a4747b99146ee94c3f556c1c03ad8980&mpshare=1&scene=1&srcid=#rd
+ *
+ * https://mp.weixin.qq.com/s?__biz=MzI5NTYwNDQxNA==&mid=2247485068&idx=1&sn=9c4a482dff4ddb1af172b1e857895bb7&chksm=ec505f5ddb27d64b5b7d133de9a0c7f362f413d1791fe42462d52e02837f968151ac30dc58f6&mpshare=1&scene=1&srcid=#rd
+ *
+ * https://mp.weixin.qq.com/s?__biz=MzkzODE3OTI0Ng==&mid=2247490835&idx=1&sn=1d70bd9af240256d5adfe7ddbd951c67&source=41#wechat_redirect
+ */
 public class LinkedList<E>
     extends AbstractSequentialList<E>
     implements List<E>, Deque<E>, Cloneable, java.io.Serializable
 {
+    // 集合元素数量
     transient int size = 0;
 
     /**
@@ -91,6 +109,7 @@ public class LinkedList<E>
      * Invariant: (first == null && last == null) ||
      *            (first.prev == null && first.item != null)
      */
+    // 指向第一个节点的指针
     transient Node<E> first;
 
     /**
@@ -98,6 +117,7 @@ public class LinkedList<E>
      * Invariant: (first == null && last == null) ||
      *            (last.next == null && last.item != null)
      */
+    // 指向最后一个节点的指针
     transient Node<E> last;
 
     /**
@@ -114,6 +134,7 @@ public class LinkedList<E>
      * @param  c the collection whose elements are to be placed into this list
      * @throws NullPointerException if the specified collection is null
      */
+    // 将集合c所有元素插入链表中
     public LinkedList(Collection<? extends E> c) {
         this();
         addAll(c);
@@ -128,7 +149,7 @@ public class LinkedList<E>
         final Node<E> newNode = new Node<>(null, e, f);
         //新建节点成为头节点
         first = newNode;
-        //头节点为空，就是链表唯恐，头尾节点是一个节点。
+        //头节点为空，就是链表为空，头尾节点是一个节点。
         if (f == null)
             last = newNode;
         //上一个头节点的前一个节点就是当前节点
@@ -138,6 +159,7 @@ public class LinkedList<E>
         modCount++;
     }
 
+    // 对于尾部插入而言，ArrayList与LinkedList的性能几乎是一致的
     // 从尾部开始追加节点
     void linkLast(E e) {
         // 把尾节点数据暂存
@@ -159,15 +181,22 @@ public class LinkedList<E>
 
     /**
      * Inserts element e before non-null Node succ.
+     * 在succ节点前增加元素e(succ不能为空)
      */
     void linkBefore(E e, Node<E> succ) {
         // assert succ != null;
+        // 拿到succ的前驱
         final Node<E> pred = succ.prev;
+        // 新new节点：前驱为pred，值为e，后继为succ
         final Node<E> newNode = new Node<>(pred, e, succ);
+        // 将succ的前驱指向当前节点
         succ.prev = newNode;
+        // pred为空，说明此时succ为首节点
         if (pred == null)
+            // 指向当前节点
             first = newNode;
         else
+            // 否则，将succ之前的前驱的后继指向当前节点
             pred.next = newNode;
         size++;
         modCount++;
@@ -201,17 +230,24 @@ public class LinkedList<E>
      */
     private E unlinkLast(Node<E> l) {
         // assert l == last && l != null;
+        // 取出尾节点中的元素
         final E element = l.item;
+        // 取出尾节点中的后继
         final Node<E> prev = l.prev;
         l.item = null;
         l.prev = null; // help GC
+        // last指向前last的前驱，也就是列表中的倒数2号位
         last = prev;
+        // 如果此时倒数2号位为空，那么列表中已无节点
         if (prev == null)
+            // first指向null
             first = null;
         else
+            // 尾节点无后继
             prev.next = null;
         size--;
         modCount++;
+        // 返回尾节点保存的元素值
         return element;
     }
 
@@ -220,27 +256,37 @@ public class LinkedList<E>
      */
     E unlink(Node<E> x) {
         // assert x != null;
+        // 保存x的元素值
         final E element = x.item;
+        // 保存x的后继
         final Node<E> next = x.next;
+        // 保存x的前驱
         final Node<E> prev = x.prev;
-
+        // 如果前驱为null，说明x为首节点，first指向x的后继
         if (prev == null) {
             first = next;
         } else {
+            // x的前驱的后继指向x的后继，即略过了x
             prev.next = next;
+            // x.prev已无用处，置空引用
             x.prev = null;
         }
 
+        // 后继为null，说明x为尾节点
         if (next == null) {
+            // last指向x的前驱
             last = prev;
         } else {
+            // x的后继的前驱指向x的前驱，即略过了x
             next.prev = prev;
+            // x.next已无用处，置空引用
             x.next = null;
         }
-
+        // 引用置空
         x.item = null;
         size--;
         modCount++;
+        // 返回所删除的节点的元素值
         return element;
     }
 
@@ -276,6 +322,7 @@ public class LinkedList<E>
      * @return the first element from this list
      * @throws NoSuchElementException if this list is empty
      */
+    // 删除头节点。
     public E removeFirst() {
         final Node<E> f = first;
         if (f == null)
@@ -289,6 +336,7 @@ public class LinkedList<E>
      * @return the last element from this list
      * @throws NoSuchElementException if this list is empty
      */
+    // 删除尾节点(last)
     public E removeLast() {
         final Node<E> l = last;
         if (l == null)
@@ -366,6 +414,7 @@ public class LinkedList<E>
      */
     public boolean remove(Object o) {
         if (o == null) {
+            // 遍历链表查找 item==null 并执行unlink(x)方法删除
             for (Node<E> x = first; x != null; x = x.next) {
                 if (x.item == null) {
                     unlink(x);
@@ -414,41 +463,58 @@ public class LinkedList<E>
      * @throws IndexOutOfBoundsException {@inheritDoc}
      * @throws NullPointerException if the specified collection is null
      */
+    // 将集合c添加到链表，如果不传index，则默认是添加到尾部。如果调用addAll(int index, Collection<? extends E> c)方法，则添加到index后面。
     public boolean addAll(int index, Collection<? extends E> c) {
         checkPositionIndex(index);
-
+        // 拿到目标集合数组
         Object[] a = c.toArray();
+        //新增元素的数量
         int numNew = a.length;
+        //如果新增元素数量为0，则不增加，并返回false
         if (numNew == 0)
             return false;
 
+        //定义index节点的前置节点，后置节点
         Node<E> pred, succ;
+        // 判断是否是链表尾部，如果是：在链表尾部追加数据
+        // 尾部的后置节点一定是null，前置节点是队尾
         if (index == size) {
             succ = null;
             pred = last;
         } else {
+            // 如果不在链表末端(而在中间部位)
+            // 取出index节点，并作为后继节点
             succ = node(index);
+            // index节点的前节点 作为前驱节点
             pred = succ.prev;
         }
 
+        // 链表批量增加，是靠for循环遍历原数组，依次执行插入节点操作
         for (Object o : a) {
-            @SuppressWarnings("unchecked") E e = (E) o;
+            @SuppressWarnings("unchecked")
+            // 类型转换
+            E e = (E) o;
+            // 前置节点为pred，后置节点为null，当前节点值为e的节点newNode
             Node<E> newNode = new Node<>(pred, e, null);
+            // 如果前置节点为空， 则newNode为头节点，否则为pred的next节点
             if (pred == null)
                 first = newNode;
             else
                 pred.next = newNode;
             pred = newNode;
         }
-
+        // 循环结束后，如果后置节点是null，说明此时是在队尾追加的
         if (succ == null) {
+            // 设置尾节点
             last = pred;
         } else {
+            // 否则是在队中插入的节点 ，更新前置节点 后置节点
             pred.next = succ;
             succ.prev = pred;
         }
-
+        // 修改数量size
         size += numNew;
+        // 修改modCount
         modCount++;
         return true;
     }
@@ -498,11 +564,16 @@ public class LinkedList<E>
      * @return the element previously at the specified position
      * @throws IndexOutOfBoundsException {@inheritDoc}
      */
+    // 修改元素比较简单，先找到index对应节点，然后对值进行修改。
     public E set(int index, E element) {
         checkElementIndex(index);
+        // 获取到需要修改元素的节点
         Node<E> x = node(index);
+        // 保存之前的值
         E oldVal = x.item;
+        // 执行修改
         x.item = element;
+        // 返回旧值
         return oldVal;
     }
 
@@ -515,6 +586,9 @@ public class LinkedList<E>
      * @param element element to be inserted
      * @throws IndexOutOfBoundsException {@inheritDoc}
      */
+    // 在头尾以外的位置插入元素当然得找出这个位置在哪里，这里面的node()方法就是关键所在，这个函数的作用就是根据索引查找元素，但是它会先判断index的位置，
+    // 如果index比size的一半(size >> 1,右移运算，相当于除以2)要小，就从头开始遍历。
+    // 否则，从尾部开始遍历。从而可以知道，对于LinkedList来说，操作的元素的位置越往中间靠拢，效率就越低
     public void add(int index, E element) {
         checkPositionIndex(index);
 
@@ -533,8 +607,10 @@ public class LinkedList<E>
      * @return the element previously at the specified position
      * @throws IndexOutOfBoundsException {@inheritDoc}
      */
+    // 根据链表的索引删除元素。
     public E remove(int index) {
         checkElementIndex(index);
+        //node(index)会返回index对应的元素
         return unlink(node(index));
     }
 
@@ -567,6 +643,7 @@ public class LinkedList<E>
             throw new IndexOutOfBoundsException(outOfBoundsMsg(index));
     }
 
+    // 检测index位置是否合法
     private void checkPositionIndex(int index) {
         if (!isPositionIndex(index))
             throw new IndexOutOfBoundsException(outOfBoundsMsg(index));
@@ -579,12 +656,14 @@ public class LinkedList<E>
     Node<E> node(int index) {
         // index 处于队列的前半部分，从头开始找
         if (index < (size >> 1)) {
+            // 把头节点赋值给x
             Node<E> x = first;
             // 直到 for 循环到 index 的前一个 node
             for (int i = 0; i < index; i++)
                 x = x.next;
             return x;
-        } else {// index 处于队列的后半部分，从尾开始找
+        } else {
+            // index 处于队列的后半部分，从尾开始找
             Node<E> x = last;
             // 直到 for 循环到 index 的后一个 node
             for (int i = size - 1; i > index; i--)
@@ -718,6 +797,7 @@ public class LinkedList<E>
      * @return {@code true} (as specified by {@link Deque#offerFirst})
      * @since 1.6
      */
+    // 作为无界队列，添加元素总是会成功的
     public boolean offerFirst(E e) {
         addFirst(e);
         return true;
