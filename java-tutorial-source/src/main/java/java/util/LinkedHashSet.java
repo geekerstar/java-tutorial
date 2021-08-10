@@ -114,7 +114,14 @@ package java.util;
  * @see     Hashtable
  * @since   1.4
  */
-
+/**
+ * LinkedHashSet继承自HashSet
+ * （1）LinkedHashSet的底层使用LinkedHashMap存储元素。
+ * （2）LinkedHashSet是有序的，它是按照插入的顺序排序的。
+ * LinkedHashSet是不支持按访问顺序对元素排序的，只能按插入顺序排序
+ *
+ * https://mp.weixin.qq.com/s?__biz=MzI5NTYwNDQxNA==&mid=2247485232&idx=3&sn=32e55276b91fd02512d50512482aa49d&chksm=ec505ee1db27d7f733d4d8cedbaf84f599ca2423b5d97cc8f1e06704be7028c164dc812f223d&mpshare=1&scene=1&srcid=&sharer_sharetime=1565412083145&sharer_shareid=535c00d0d7095600f2fcdf96cc5a31ba#rd
+ */
 public class LinkedHashSet<E>
     extends HashSet<E>
     implements Set<E>, Cloneable, java.io.Serializable {
@@ -130,6 +137,7 @@ public class LinkedHashSet<E>
      * @throws     IllegalArgumentException  if the initial capacity is less
      *               than zero, or if the load factor is nonpositive
      */
+    // 传入容量和装载因子
     public LinkedHashSet(int initialCapacity, float loadFactor) {
         super(initialCapacity, loadFactor, true);
     }
@@ -142,6 +150,7 @@ public class LinkedHashSet<E>
      * @throws  IllegalArgumentException if the initial capacity is less
      *              than zero
      */
+    // 只传入容量, 装载因子默认为0.75
     public LinkedHashSet(int initialCapacity) {
         super(initialCapacity, .75f, true);
     }
@@ -150,6 +159,7 @@ public class LinkedHashSet<E>
      * Constructs a new, empty linked hash set with the default initial
      * capacity (16) and load factor (0.75).
      */
+    // 使用默认容量16, 默认装载因子0.75
     public LinkedHashSet() {
         super(16, .75f, true);
     }
@@ -164,6 +174,10 @@ public class LinkedHashSet<E>
      *           this set
      * @throws NullPointerException if the specified collection is null
      */
+    // 将集合c中的所有元素添加到LinkedHashSet中
+    // 好奇怪, 这里计算容量的方式又变了
+    // HashSet中使用的是Math.max((int) (c.size()/.75f) + 1, 16)
+    // 这一点有点不得其解, 是作者偷懒？
     public LinkedHashSet(Collection<? extends E> c) {
         super(Math.max(2*c.size(), 11), .75f, true);
         addAll(c);
@@ -188,6 +202,7 @@ public class LinkedHashSet<E>
      * @return a {@code Spliterator} over the elements in this set
      * @since 1.8
      */
+    // 可分割的迭代器, 主要用于多线程并行迭代处理时使用
     @Override
     public Spliterator<E> spliterator() {
         return Spliterators.spliterator(this, Spliterator.DISTINCT | Spliterator.ORDERED);
