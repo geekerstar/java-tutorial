@@ -153,6 +153,16 @@ import java.util.function.Function;
  * @see     Hashtable
  * @since   1.2
  */
+
+/**
+ *
+ *
+ * https://mp.weixin.qq.com/s?__biz=MzI3ODg2OTY1OQ==&mid=2247483957&idx=1&sn=e865001c7284ac5b00e67507c1b9410c&chksm=eb5121c1dc26a8d76cda63ba0dcbc1ffa259bd0b68759d6f887bd8b2a88b07eddc79a980b55a&mpshare=1&scene=1&srcid=1024MPTQN0LPC8aNXESAaOgd#rd
+ *
+ * https://mp.weixin.qq.com/s?__biz=MzI3ODg2OTY1OQ==&mid=2247483957&idx=2&sn=05ac5a1544de26fe7f5946b9938333cd&chksm=eb5121c1dc26a8d7c20e99886b9533691f0f26b22489b51de1bb8786da8baf502d835bc7d033&mpshare=1&scene=1&srcid=1024LkhQQXpRMmYJuQZvtCwQ#rd
+ *
+ * https://mp.weixin.qq.com/s?__biz=MzI4Njc5NjM1NQ==&mid=2247487670&idx=1&sn=3e8a71da506212fbffc29c4a048dbd48&chksm=ebd62f9adca1a68c3d76cb9272aecb89e570b06488fbe916837bf91d280e7a6a3c74adcffc13&mpshare=1&scene=1&srcid=#rd
+ */
 public class HashMap<K,V> extends AbstractMap<K,V>
     implements Map<K,V>, Cloneable, Serializable {
 
@@ -254,13 +264,19 @@ public class HashMap<K,V> extends AbstractMap<K,V>
     static final int MAXIMUM_CAPACITY = 1 << 30;
    //负载因子默认值
     static final float DEFAULT_LOAD_FACTOR = 0.75f;
-    //bin(桶)容量大于等于8时，链表转化成红黑树
+    //bin(桶)容量大于等于8时，链表转化成红黑树,其实还要求桶的中数量>=64,后面会提到
     static final int TREEIFY_THRESHOLD = 8;
 
     //bin(桶)容量小于等于6时，红黑树转化成链表
     static final int UNTREEIFY_THRESHOLD = 6;
 
-   //容量最小64时才会转会成红黑树
+    // 当Node数组容量>=64的前提下，如果某一个桶中链表长度>=8，则会将链表结构转换成红黑树结构
+    // 桶中结构转化为红黑树对应的table的最小大小
+    // 当需要将解决 hash 冲突的链表转变为红黑树时，
+    // 需要判断下此时数组容量，
+    // 若是由于数组容量太小（小于　MIN_TREEIFY_CAPACITY　）
+    // 导致的 hash 冲突太多，则不进行链表转变为红黑树操作，
+    // 转为利用　resize() 函数对　hashMap 扩容
     static final int MIN_TREEIFY_CAPACITY = 64;
 
     //用于fail-fast的，记录HashMap结构发生变化(数量变化或rehash)的数目
@@ -273,15 +289,22 @@ public class HashMap<K,V> extends AbstractMap<K,V>
     // 如果是通过 resize 方法进行扩容后，大小 = 数组容量 * 0.75
     int threshold;
 
-    //存放数据的数组
+    //我们往map中put的(k,v)都被封装在Node中，
+    //所有的Node都存放在table数组中
+    // 该表在首次使用时初始化，并根据需要调整大小。 分配时，
+    // 长度始终是2的幂。
     transient Node<K,V>[] table;
 
     //bin node 节点
-    static class Node<K,V> implements Map.Entry<K,V> {//Map.Entry是个接口
+    static class Node<K,V> implements Map.Entry<K,V> {
+        //Map.Entry是个接口
         final int hash;//当前node的hash值
+        //保存map中的key
         final K key;
+        //保存map中的value
         V value;
-        Node<K,V> next;//指向当前node的下一个节点，构成单向链表
+        //指向当前node的下一个节点，构成单向链表
+        Node<K,V> next;
 
         Node(int hash, K key, V value, Node<K,V> next) {
             this.hash = hash;
@@ -1018,6 +1041,8 @@ public class HashMap<K,V> extends AbstractMap<K,V>
     /**
      * Returns a power of two size for the given target capacity.
      */
+    // 返回一个数：这个数是大于等于cap并且是2的整数次幂的所有数中最小的那个，即返回一个最接近cap(>=cap)，并且是2的整数次幂的数。
+    // 具体逻辑如下:一个数是2的整数次幂，那么这个数减1的二进制就是一串掩码，即二进制从某位开始是一 串连续的1。所以只要对的对应的掩码，掩码+1一定是2的整数次幂，这也是为什么n=cap-1的原因。
     static final int tableSizeFor(int cap) {
         int n = cap - 1;
         n |= n >>> 1;
@@ -1034,6 +1059,7 @@ public class HashMap<K,V> extends AbstractMap<K,V>
      * Holds cached entrySet(). Note that AbstractMap fields are used
      * for keySet() and values().
      */
+    // 用于返回keySet和values
     transient Set<Map.Entry<K,V>> entrySet;
 
     /**
@@ -1041,6 +1067,8 @@ public class HashMap<K,V> extends AbstractMap<K,V>
      *
      * @serial
      */
+    // 当我们调低负载因子时，HashMap 所能容纳的键值对数量变少。扩容时，重新将键值对存储新的桶数组里，键的键之间产生的碰撞会下降，链表长度变短。此时，HashMap 的增删改查等操作的效率将会变高，这里是典型的拿空间换时间。
+    //相反，如果增加负载因子（负载因子可以大于1），HashMap 所能容纳的键值对数量变多，空间利用率高，但碰撞率也高。这意味着链表长度变长，效率也随之降低，这种情况是拿时间换空间。至于负载因子怎么调节，这个看使用场景了。
     final float loadFactor;
 
     /* ---------------- Public operations -------------- */
@@ -1054,16 +1082,23 @@ public class HashMap<K,V> extends AbstractMap<K,V>
      * @throws IllegalArgumentException if the initial capacity is negative
      *         or the load factor is nonpositive
      */
+    // 构造器：指定map的大小，和loadfactor
     public HashMap(int initialCapacity, float loadFactor) {
+        // 初始容量不能小于0，否则报错
         if (initialCapacity < 0)
             throw new IllegalArgumentException("Illegal initial capacity: " +
                                                initialCapacity);
+        // 初始容量不能大于最大值，否则为最大值
         if (initialCapacity > MAXIMUM_CAPACITY)
             initialCapacity = MAXIMUM_CAPACITY;
+        //负载因子不能小于或等于0，不能为非数字
         if (loadFactor <= 0 || Float.isNaN(loadFactor))
             throw new IllegalArgumentException("Illegal load factor: " +
                                                loadFactor);
+
+        // 初始化负载因子
         this.loadFactor = loadFactor;
+        // tableSizeFor函数，该函数返回值：>=initialCapacity、返回值是2的整数次幂，并且得是满足上面两个条件的所有数值中最小的那个数。
         this.threshold = tableSizeFor(initialCapacity);
     }
 
@@ -1074,6 +1109,7 @@ public class HashMap<K,V> extends AbstractMap<K,V>
      * @param  initialCapacity the initial capacity.
      * @throws IllegalArgumentException if the initial capacity is negative.
      */
+    // 只指定HashMap容量的构造器，loadfactor使用的是默认的值:0.75
     public HashMap(int initialCapacity) {
         this(initialCapacity, DEFAULT_LOAD_FACTOR);
     }
@@ -1082,6 +1118,7 @@ public class HashMap<K,V> extends AbstractMap<K,V>
      * Constructs an empty <tt>HashMap</tt> with the default initial capacity
      * (16) and the default load factor (0.75).
      */
+    // 无参构造器，默认loadfactor：0.75,默认的容量是16
     public HashMap() {
         this.loadFactor = DEFAULT_LOAD_FACTOR; // all other fields defaulted
     }
@@ -1162,6 +1199,7 @@ public class HashMap<K,V> extends AbstractMap<K,V>
      *
      * @see #put(Object, Object)
      */
+    //  get函数实质就是进行链表或者红黑树遍历搜索指定key的节点的过程；另外需要注意到HashMap的get函数的返回值不能判断一个key是否包含在map中，get返回null有可能是不包含该key；也有可能该key对应的value为null。HashMap中允许key为null，允许value为null。
     public V get(Object key) {
         Node<K,V> e;
         return (e = getNode(hash(key), key)) == null ? null : e.value;
@@ -1180,6 +1218,7 @@ public class HashMap<K,V> extends AbstractMap<K,V>
             //hash 和 key 的 hash 相等，直接返回
             if (first.hash == hash &&
                 ((k = first.key) == key || (key != null && key.equals(k))))
+                //一次就匹配到了，直接返回，否则进行搜索
                 return first;
             //hash不等，看看当前节点的 next 是否有值
             if ((e = first.next) != null) {
@@ -1208,6 +1247,7 @@ public class HashMap<K,V> extends AbstractMap<K,V>
      * key.
      */
     public boolean containsKey(Object key) {
+        //注意与get函数区分，我们往map中put的所有的<key,value>都被封装在Node中，如果Node都不存在显然一定不包含对应的key
         return getNode(hash(key), key) != null;
     }
 
@@ -1224,6 +1264,7 @@ public class HashMap<K,V> extends AbstractMap<K,V>
      *         previously associated <tt>null</tt> with <tt>key</tt>.)
      */
     public V put(K key, V value) {
+        // 注意前3个参数，后面2个参数这里不太重要，因为所有的put操作后面的2个参数默认值都一样
         return putVal(hash(key), key, value, false, true);
     }
 
@@ -1251,6 +1292,7 @@ public class HashMap<K,V> extends AbstractMap<K,V>
                    boolean evict) {
         Node<K,V>[] tab; Node<K,V> p; int n, i;
         //如果数组为空，初始化
+        // HashMap是懒加载，所有put的时候要先检查table数组是否已经初始化了，没有初始化得先初始化table数组，保证table数组一定初始化了
         if ((tab = table) == null || (n = tab.length) == 0)
             n = (tab = resize()).length;
         // hashCode的算法先右移16 在并上数组大小-1
