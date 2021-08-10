@@ -127,6 +127,10 @@ import java.util.function.BiFunction;
  * @see     TreeMap
  * @since JDK1.0
  */
+
+/**
+ * https://mp.weixin.qq.com/s?__biz=MzkzODE3OTI0Ng==&mid=2247491157&idx=1&sn=64b850d07f4ef70ab93f3d410f6f6163&source=41#wechat_redirect
+ */
 public class Hashtable<K,V>
     extends Dictionary<K,V>
     implements Map<K,V>, Cloneable, java.io.Serializable {
@@ -134,11 +138,14 @@ public class Hashtable<K,V>
     /**
      * The hash table data.
      */
+    // 由Entry对象组成的数组
+    // 表示一个由 Entry 对象组成的链表数组，Entry 是一个单向链表，哈希表的key-value键值对都是存储在 Entry 数组中的;
     private transient Entry<?,?>[] table;
 
     /**
      * The total number of entries in the hash table.
      */
+    // Hashtable中Entry对象的个数,用于记录保存的键值对的数量;
     private transient int count;
 
     /**
@@ -147,6 +154,7 @@ public class Hashtable<K,V>
      *
      * @serial
      */
+    // Hashtable进行扩容的阈值,用于判断是否需要调整 Hashtable 的容量，threshold 等于容量 * 加载因子;
     private int threshold;
 
     /**
@@ -154,6 +162,7 @@ public class Hashtable<K,V>
      *
      * @serial
      */
+    // 负载因子，默认0.75
     private float loadFactor;
 
     /**
@@ -163,6 +172,7 @@ public class Hashtable<K,V>
      * rehash).  This field is used to make iterators on Collection-views of
      * the Hashtable fail-fast.  (See ConcurrentModificationException).
      */
+    // 记录修改的次数
     private transient int modCount = 0;
 
     /** use serialVersionUID from JDK 1.0.2 for interoperability */
@@ -177,6 +187,8 @@ public class Hashtable<K,V>
      * @exception  IllegalArgumentException  if the initial capacity is less
      *             than zero, or if the load factor is nonpositive.
      */
+    // HashTable 默认的初始大小为 11，如果在初始化给定容量大小，那么 HashTable 会直接使用你给定的大小；
+    // 扩容的阈值threshold等于initialCapacity * loadFactor
     public Hashtable(int initialCapacity, float loadFactor) {
         if (initialCapacity < 0)
             throw new IllegalArgumentException("Illegal Capacity: "+
@@ -386,24 +398,34 @@ public class Hashtable<K,V>
      * and load factor.
      */
     @SuppressWarnings("unchecked")
+    // HashTable 每次扩充为原来的 2n+1。
+    // HashTable 会尽量使用素数、奇数来做数组的容量，而 HashMap 则总是使用 2 的幂作为数组的容量
+    //1、通过 key 计算对象存储在数组中的下标；
+    //2、如果链表中有 key，直接进行新旧值覆盖处理；
+    //3、如果链表中没有 key，判断是否需要扩容，如果需要扩容，先扩容，再插入数据；
+    //有一个值得注意的地方是 put 方法加了synchronized关键字，所以，在同步操作的时候，是线程安全的。
     protected void rehash() {
         int oldCapacity = table.length;
         Entry<?,?>[] oldMap = table;
 
         // overflow-conscious code
+        // 将旧数组长度进行位运算，然后 +1
+        // 等同于每次扩容为原来的 2n+1
         int newCapacity = (oldCapacity << 1) + 1;
         if (newCapacity - MAX_ARRAY_SIZE > 0) {
             if (oldCapacity == MAX_ARRAY_SIZE)
                 // Keep running with MAX_ARRAY_SIZE buckets
+                //大于最大阀值，不再扩容
                 return;
             newCapacity = MAX_ARRAY_SIZE;
         }
         Entry<?,?>[] newMap = new Entry<?,?>[newCapacity];
 
         modCount++;
+        //重新计算扩容阀值
         threshold = (int)Math.min(newCapacity * loadFactor, MAX_ARRAY_SIZE + 1);
         table = newMap;
-
+        //将旧数组中的数据复制到新数组中
         for (int i = oldCapacity ; i-- > 0 ;) {
             for (Entry<K,V> old = (Entry<K,V>)oldMap[i] ; old != null ; ) {
                 Entry<K,V> e = old;
@@ -417,20 +439,24 @@ public class Hashtable<K,V>
     }
 
     private void addEntry(int hash, K key, V value, int index) {
+        //新增修改次数
         modCount++;
 
         Entry<?,?> tab[] = table;
         if (count >= threshold) {
             // Rehash the table if the threshold is exceeded
+            //数组容量大于扩容阀值，进行扩容
             rehash();
 
             tab = table;
+            //重新计算对象存储下标
             hash = key.hashCode();
             index = (hash & 0x7FFFFFFF) % tab.length;
         }
 
         // Creates the new entry.
         @SuppressWarnings("unchecked")
+        //将对象存储在数组中
         Entry<K,V> e = (Entry<K,V>) tab[index];
         tab[index] = new Entry<>(hash, key, value, e);
         count++;
@@ -461,9 +487,12 @@ public class Hashtable<K,V>
 
         // Makes sure the key is not already in the hashtable.
         Entry<?,?> tab[] = table;
+        //通过key 计算存储下标
         int hash = key.hashCode();
         int index = (hash & 0x7FFFFFFF) % tab.length;
         @SuppressWarnings("unchecked")
+        //循环遍历数组链表
+        //如果有相同的key并且hash相同，进行覆盖处理
         Entry<K,V> entry = (Entry<K,V>)tab[index];
         for(; entry != null ; entry = entry.next) {
             if ((entry.hash == hash) && entry.key.equals(key)) {
@@ -472,7 +501,7 @@ public class Hashtable<K,V>
                 return old;
             }
         }
-
+        //加入数组链表中
         addEntry(hash, key, value, index);
         return null;
     }
@@ -491,6 +520,8 @@ public class Hashtable<K,V>
         int hash = key.hashCode();
         int index = (hash & 0x7FFFFFFF) % tab.length;
         @SuppressWarnings("unchecked")
+        //循环遍历链表，通过hash和key判断键是否存在
+        //如果存在，直接将改节点设置为空，并从链表上移除
         Entry<K,V> e = (Entry<K,V>)tab[index];
         for(Entry<K,V> prev = null ; e != null ; prev = e, e = e.next) {
             if ((e.hash == hash) && e.key.equals(key)) {
@@ -911,8 +942,11 @@ public class Hashtable<K,V>
         Objects.requireNonNull(value);
 
         // Makes sure the key is not already in the hashtable.
+        // HashTable 的 key 不能为空，否则报空指针错误！
         Entry<?,?> tab[] = table;
         int hash = key.hashCode();
+        //通过除法取余计算数组存放下标
+        // 0x7FFFFFFF 是最大的 int 型数的二进制表示
         int index = (hash & 0x7FFFFFFF) % tab.length;
         @SuppressWarnings("unchecked")
         Entry<K,V> entry = (Entry<K,V>)tab[index];
@@ -1232,6 +1266,7 @@ public class Hashtable<K,V>
     /**
      * Hashtable bucket collision list entry
      */
+    // Entry用于存储链表数据，实现了Map.Entry接口，本质是就是一个映射（键值对)
     private static class Entry<K,V> implements Map.Entry<K,V> {
         final int hash;
         final K key;
