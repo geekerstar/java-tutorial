@@ -91,6 +91,20 @@ import java.io.InvalidObjectException;
  * @since   1.2
  */
 
+/**
+ * （1）HashSet内部使用HashMap的key存储元素，以此来保证元素不重复；
+ * （2）HashSet是无序的，因为HashMap的key是无序的；
+ * （3）HashSet中允许有一个null元素，因为HashMap允许key为null；
+ * （4）HashSet是非线程安全的；
+ * （5）HashSet是没有get()方法的；
+ *
+ * https://mp.weixin.qq.com/s?__biz=MzI5NTYwNDQxNA==&mid=2247485232&idx=2&sn=32a7f6bf52dcc0e29e5f25f748780fbf&chksm=ec505ee1db27d7f7a61340e2a9d7e5a0d9501dd109702cf2071b60995790deaadbfc7e5699cd&mpshare=1&scene=1&srcid=&sharer_sharetime=1565412079545&sharer_shareid=535c00d0d7095600f2fcdf96cc5a31ba#rd
+ *
+ * https://mp.weixin.qq.com/s/FRGRhxjGaLc5iBA-eIzstQ
+ *
+ * https://mp.weixin.qq.com/s/sD8RcFXUcia22mzP3NOG6A
+ *
+ */
 public class HashSet<E>
     extends AbstractSet<E>
     implements Set<E>, Cloneable, java.io.Serializable
@@ -100,12 +114,14 @@ public class HashSet<E>
     private transient HashMap<E,Object> map;
 
     // Dummy value to associate with an Object in the backing Map
+    // 虚拟对象，用来作为value放到map中
     private static final Object PRESENT = new Object();
 
     /**
      * Constructs a new, empty set; the backing <tt>HashMap</tt> instance has
      * default initial capacity (16) and load factor (0.75).
      */
+    // 内部使用HashMap
     public HashSet() {
         map = new HashMap<>();
     }
@@ -120,6 +136,9 @@ public class HashSet<E>
      * @throws NullPointerException if the specified collection is null
      */
     // 对 HashMap 的容量进行了计算，在 16 和 给定值大小之间选择最大的值
+    // 把另一个集合的元素全都添加到当前Set中
+    // 注意，这里初始化map的时候是计算了它的初始容量的
+    // 我们预估HashMap要存储n个元素，那么，它的容量就应该指定为((n/0.75f) + 1)，如果这个值小于16，那就直接使用16得了。
     public HashSet(Collection<? extends E> c) {
         map = new HashMap<>(Math.max((int) (c.size()/.75f) + 1, 16));
         addAll(c);
@@ -134,6 +153,7 @@ public class HashSet<E>
      * @throws     IllegalArgumentException if the initial capacity is less
      *             than zero, or if the load factor is nonpositive
      */
+    // 指定初始容量和装载因子
     public HashSet(int initialCapacity, float loadFactor) {
         map = new HashMap<>(initialCapacity, loadFactor);
     }
@@ -146,6 +166,7 @@ public class HashSet<E>
      * @throws     IllegalArgumentException if the initial capacity is less
      *             than zero
      */
+    // 只指定初始容量
     public HashSet(int initialCapacity) {
         map = new HashMap<>(initialCapacity);
     }
@@ -163,6 +184,8 @@ public class HashSet<E>
      * @throws     IllegalArgumentException if the initial capacity is less
      *             than zero, or if the load factor is nonpositive
      */
+    // 非public，主要是给LinkedHashSet使用的
+    // dummy是没有实际意义的, 只是为了跟上上面那个操持方法签名不同而已
     HashSet(int initialCapacity, float loadFactor, boolean dummy) {
         map = new LinkedHashMap<>(initialCapacity, loadFactor);
     }
@@ -174,6 +197,7 @@ public class HashSet<E>
      * @return an Iterator over the elements in this set
      * @see ConcurrentModificationException
      */
+    // 迭代器
     public Iterator<E> iterator() {
         return map.keySet().iterator();
     }
@@ -183,6 +207,7 @@ public class HashSet<E>
      *
      * @return the number of elements in this set (its cardinality)
      */
+    // 元素个数
     public int size() {
         return map.size();
     }
@@ -192,6 +217,7 @@ public class HashSet<E>
      *
      * @return <tt>true</tt> if this set contains no elements
      */
+    // 检查是否为空
     public boolean isEmpty() {
         return map.isEmpty();
     }
@@ -205,6 +231,7 @@ public class HashSet<E>
      * @param o element whose presence in this set is to be tested
      * @return <tt>true</tt> if this set contains the specified element
      */
+    // 检查是否包含某个元素
     public boolean contains(Object o) {
         return map.containsKey(o);
     }
@@ -221,6 +248,7 @@ public class HashSet<E>
      * @return <tt>true</tt> if this set did not already contain the specified
      * element
      */
+    // 直接调用HashMap的put()方法，把元素本身作为key，把PRESENT作为value，也就是这个map中所有的value都是一样的。
     public boolean add(E e) {
         return map.put(e, PRESENT)==null;
     }
@@ -237,6 +265,7 @@ public class HashSet<E>
      * @param o object to be removed from this set, if present
      * @return <tt>true</tt> if the set contained the specified element
      */
+    // 直接调用HashMap的remove()方法，注意map的remove返回是删除元素的value，而Set的remov返回的是boolean类型。
     public boolean remove(Object o) {
         return map.remove(o)==PRESENT;
     }
@@ -245,6 +274,7 @@ public class HashSet<E>
      * Removes all of the elements from this set.
      * The set will be empty after this call returns.
      */
+    // 清空所有元素
     public void clear() {
         map.clear();
     }
@@ -256,6 +286,7 @@ public class HashSet<E>
      * @return a shallow copy of this set
      */
     @SuppressWarnings("unchecked")
+    // 克隆方法
     public Object clone() {
         try {
             HashSet<E> newSet = (HashSet<E>) super.clone();
@@ -276,19 +307,24 @@ public class HashSet<E>
      *             (int), followed by all of its elements (each an Object) in
      *             no particular order.
      */
+    // 序列化写出方法
     private void writeObject(java.io.ObjectOutputStream s)
         throws java.io.IOException {
         // Write out any hidden serialization magic
+        // 写出非static非transient属性
         s.defaultWriteObject();
 
         // Write out HashMap capacity and load factor
+        // 写出map的容量和装载因子
         s.writeInt(map.capacity());
         s.writeFloat(map.loadFactor());
 
         // Write out size
+        // 写出元素个数
         s.writeInt(map.size());
 
         // Write out all elements in the proper order.
+        // 遍历写出所有元素
         for (E e : map.keySet())
             s.writeObject(e);
     }
@@ -297,18 +333,23 @@ public class HashSet<E>
      * Reconstitute the <tt>HashSet</tt> instance from a stream (that is,
      * deserialize it).
      */
+    // 序列化读入方法
     private void readObject(java.io.ObjectInputStream s)
         throws java.io.IOException, ClassNotFoundException {
         // Read in any hidden serialization magic
+        // 读入非static非transient属性
         s.defaultReadObject();
 
         // Read capacity and verify non-negative.
+        // 读入容量, 并检查不能小于0
         int capacity = s.readInt();
         if (capacity < 0) {
             throw new InvalidObjectException("Illegal capacity: " +
                                              capacity);
         }
 
+        // 读入装载因子, 并检查不能小于等于0或者是NaN(Not a Number)
+        // java.lang.Float.NaN = 0.0f / 0.0f;
         // Read load factor and verify positive and non NaN.
         float loadFactor = s.readFloat();
         if (loadFactor <= 0 || Float.isNaN(loadFactor)) {
@@ -317,6 +358,7 @@ public class HashSet<E>
         }
 
         // Read size and verify non-negative.
+        // 读入元素个数并检查不能小于0
         int size = s.readInt();
         if (size < 0) {
             throw new InvalidObjectException("Illegal size: " +
@@ -325,15 +367,19 @@ public class HashSet<E>
 
         // Set the capacity according to the size and load factor ensuring that
         // the HashMap is at least 25% full but clamping to maximum capacity.
+        // 根据元素个数重新设置容量
+        // 这是为了保证map有足够的容量容纳所有元素, 防止无意义的扩容
         capacity = (int) Math.min(size * Math.min(1 / loadFactor, 4.0f),
                 HashMap.MAXIMUM_CAPACITY);
 
         // Create backing HashMap
+        // 创建map, 检查是不是LinkedHashSet类型
         map = (((HashSet<?>)this) instanceof LinkedHashSet ?
                new LinkedHashMap<E,Object>(capacity, loadFactor) :
                new HashMap<E,Object>(capacity, loadFactor));
 
         // Read in all elements in the proper order.
+        // 读入所有元素, 并放入map中
         for (int i=0; i<size; i++) {
             @SuppressWarnings("unchecked")
                 E e = (E) s.readObject();
@@ -353,6 +399,7 @@ public class HashSet<E>
      * @return a {@code Spliterator} over the elements in this set
      * @since 1.8
      */
+    // 可分割的迭代器, 主要用于多线程并行迭代处理时使用
     public Spliterator<E> spliterator() {
         return new HashMap.KeySpliterator<E,Object>(map, 0, -1, 0, 0);
     }
