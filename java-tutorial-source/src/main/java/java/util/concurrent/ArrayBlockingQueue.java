@@ -87,6 +87,15 @@ import java.util.Spliterator;
  * @author Doug Lea
  * @param <E> the type of elements held in this collection
  */
+
+/**
+ * （1）ArrayBlockingQueue不需要扩容，因为是初始化时指定容量，并循环利用数组；
+ * （2）ArrayBlockingQueue利用takeIndex和putIndex循环利用数组；
+ * （3）入队和出队各定义了四组方法为满足不同的用途；
+ * （4）利用重入锁和两个条件保证并发安全；
+ *
+ * https://mp.weixin.qq.com/s?__biz=MzI5NTYwNDQxNA==&mid=2247485328&idx=2&sn=b955b6134bdbd8a863f1676223ce7d77&chksm=ec505e41db27d75727e7035c8ecf1feaf39c95b26b48650338fb01586ef8388f180b6b241671&mpshare=1&scene=1&srcid=&sharer_sharetime=1567245167185&sharer_shareid=535c00d0d7095600f2fcdf96cc5a31ba#rd
+ */
 public class ArrayBlockingQueue<E> extends AbstractQueue<E>
         implements BlockingQueue<E>, java.io.Serializable {
 
@@ -98,11 +107,9 @@ public class ArrayBlockingQueue<E> extends AbstractQueue<E>
      */
     private static final long serialVersionUID = -817911632652898426L;
 
-
-
-
-
-
+    //（1）利用数组存储元素；
+    //（2）通过放指针和取指针来标记下一次操作的位置；
+    //（3）利用重入锁来保证并发安全；
 
     // 队列存放在 object 的数组里面
     // 数组大小必须在初始化的时候手动设置，没有默认大小
@@ -120,10 +127,10 @@ public class ArrayBlockingQueue<E> extends AbstractQueue<E>
     // 可重入的锁
     final ReentrantLock lock;
 
-    // take的队列
+    // take的队列 非空条件
     private final Condition notEmpty;
 
-    // put的队列
+    // put的队列 非满条件
     private final Condition notFull;
 
 
@@ -252,10 +259,15 @@ public class ArrayBlockingQueue<E> extends AbstractQueue<E>
     // fair 如果是 true 话，就会按照线程等待的排队顺序唤醒线程
     // 如果是 false 的话，就会随机唤醒线程
     // 通过利用锁的公平和非公平，来实现了 put 和 take 阻塞被唤醒时的公平和非公平
+
+    //（1）ArrayBlockingQueue初始化时必须传入容量，也就是数组的大小；
+    //（2）可以通过构造方法控制重入锁的类型是公平锁还是非公平锁；
     public ArrayBlockingQueue(int capacity, boolean fair) {
         if (capacity <= 0)
             throw new IllegalArgumentException();
+        // 初始化数组
         this.items = new Object[capacity];
+        // 创建重入锁及两个条件
         lock = new ReentrantLock(fair);
         // 队列不为空 Condition，在 put 成功时使用
         notEmpty = lock.newCondition();
@@ -317,7 +329,13 @@ public class ArrayBlockingQueue<E> extends AbstractQueue<E>
      * @throws IllegalStateException if this queue is full
      * @throws NullPointerException if the specified element is null
      */
+    //（1）add(e)时如果队列满了则抛出异常；
+    //（2）offer(e)时如果队列满了则返回false；
+    //（3）put(e)时如果队列满了则使用notFull等待；
+    //（4）offer(e, timeout, unit)时如果队列满了则等待一段时间后如果队列依然满就返回false；
+    //（5）利用放指针循环使用数组来存储元素；
     public boolean add(E e) {
+        // 调用父类的add(e)方法
         return super.add(e);
     }
 
@@ -332,6 +350,7 @@ public class ArrayBlockingQueue<E> extends AbstractQueue<E>
      */
     // 新增
     public boolean offer(E e) {
+        // 元素不可为空
         checkNotNull(e);
         final ReentrantLock lock = this.lock;
         lock.lock();
@@ -340,7 +359,7 @@ public class ArrayBlockingQueue<E> extends AbstractQueue<E>
             if (count == items.length)
                 return false;
             else {
-                // 新增
+                // 如果数组没满就调用入队方法并返回true
                 enqueue(e);
                 return true;
             }
@@ -361,12 +380,22 @@ public class ArrayBlockingQueue<E> extends AbstractQueue<E>
         // 元素不能为空
         checkNotNull(e);
         final ReentrantLock lock = this.lock;
+        // 加锁，如果线程中断了抛出异常
         lock.lockInterruptibly();
         try {
             // 队列如果是满的，就无限等待
             // 一直等待队列中有数据被拿走时，自己被唤醒
+            // 如果数组满了，使用notFull等待
+            // notFull等待的意思是说现在队列满了
+            // 只有取走一个元素后，队列才不满
+            // 然后唤醒notFull，然后继续现在的逻辑
+            // 这里之所以使用while而不是if
+            // 是因为有可能多个线程阻塞在lock上
+            // 即使唤醒了可能其它线程先一步修改了队列又变成满的了
+            // 这时候需要再次等待
             while (count == items.length)
                 notFull.await();
+            // 入队
             enqueue(e);
         } finally {
             lock.unlock();
@@ -378,13 +407,17 @@ public class ArrayBlockingQueue<E> extends AbstractQueue<E>
         // assert items[putIndex] == null;
         final Object[] items = this.items;
         // putIndex 为本次插入的位置
+        // 把元素直接放在放指针的位置上
         items[putIndex] = x;
         // ++ putIndex 计算下次插入的位置
         // 如果下次插入的位置，正好等于队尾，下次插入就从 0 开始
+        // 如果放指针到数组尽头了，就返回头部
         if (++putIndex == items.length)
             putIndex = 0;
+        // 数量加1
         count++;
         // 唤醒因为队列空，所以等待的线程
+        // 唤醒notEmpty，因为入队了一个元素，所以肯定不为空了
         notEmpty.signal();
     }
 
@@ -404,11 +437,14 @@ public class ArrayBlockingQueue<E> extends AbstractQueue<E>
         final ReentrantLock lock = this.lock;
         lock.lockInterruptibly();
         try {
+            // 如果数组满了，就阻塞nanos纳秒
+            // 如果唤醒这个线程时依然没有空间且时间到了就返回false
             while (count == items.length) {
                 if (nanos <= 0)
                     return false;
                 nanos = notFull.awaitNanos(nanos);
             }
+            // 入队
             enqueue(e);
             return true;
         } finally {
