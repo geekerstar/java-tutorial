@@ -93,6 +93,24 @@ import java.util.Spliterators;
  * @author Doug Lea and Bill Scherer and Michael Scott
  * @param <E> the type of elements held in this collection
  */
+
+/**
+ * （1）这个阻塞队列里面是会自旋的；
+ * （2）它使用了一个叫做transferer的东西来交换元素；
+ *
+ * （1）SynchronousQueue是java里的无缓冲队列，用于在两个线程之间直接移交元素；
+ * （2）SynchronousQueue有两种实现方式，一种是公平（队列）方式，一种是非公平（栈）方式；
+ * （3）栈方式中的节点有三种模式：生产者、消费者、正在匹配中；
+ * （4）栈方式的大致思路是如果栈顶元素跟自己一样的模式就入栈并等待被匹配，否则就匹配，匹配到了就返回；
+ *
+ * （1）SynchronousQueue真的是无缓冲的队列吗？
+ * 通过源码分析，我们可以发现其实SynchronousQueue内部或者使用栈或者使用队列来存储包含线程和元素值的节点，如果同一个模式的节点过多的话，它们都会存储进来，且都会阻塞着，所以，严格上来说，SynchronousQueue并不能算是一个无缓冲队列。
+ * （2）SynchronousQueue有什么缺点呢？
+ * 试想一下，如果有多个生产者，但只有一个消费者，如果消费者处理不过来，是不是生产者都会阻塞起来？反之亦然。
+ * 这是一件很危险的事，所以，SynchronousQueue一般用于生产、消费的速度大致相当的情况，这样才不会导致系统中过多的线程处于阻塞状态。
+ *
+ * https://mp.weixin.qq.com/s?__biz=MzI5NTYwNDQxNA==&mid=2247485382&idx=2&sn=af167dd2954a1bd73ccfb97406cbea66&chksm=ec505e17db27d701021ecf9e6a432d3a0e8f0f2acad3afec5be49856ddcdd883ef011b4444ab&mpshare=1&scene=1&srcid=&sharer_sharetime=1568514580816&sharer_shareid=535c00d0d7095600f2fcdf96cc5a31ba#rd
+ */
 public class SynchronousQueue<E> extends AbstractQueue<E>
     implements BlockingQueue<E>, java.io.Serializable {
     private static final long serialVersionUID = -3223113410248163686L;
@@ -174,15 +192,9 @@ public class SynchronousQueue<E> extends AbstractQueue<E>
      * node has ever referred to since arrival.
      */
 
-
-
-
-
-
-
-
     // 堆栈和双向队列共同的接口
     // 负责执行 put or take
+    // Transferer抽象类，主要定义了一个transfer方法用来传输元素
     abstract static class Transferer<E> {
         //e为空的，会直接返回特殊值，不为空会传递给消费者
         abstract E transfer(E e, boolean timed, long nanos);
@@ -190,16 +202,18 @@ public class SynchronousQueue<E> extends AbstractQueue<E>
 
     // 堆栈 后入先出 非公平
     // Scherer-Scott 算法
+    // 以栈方式实现的Transferer
     static final class TransferStack<E> extends Transferer<E> {
-        // 代表着执行的是  take方法
+        // 栈中节点的几种类型
+        // 1. 消费者（请求数据的） 代表着执行的是  take方法
         static final int REQUEST    = 0;
-        // 代表着执行的是 put 方法
+        // 2. 生产者（提供数据的） 代表着执行的是 put 方法
         static final int DATA       = 1;
-        // 栈头正在阻塞等待其他线程进行 put 或 take
+        // 3. 二者正在撮合中 栈头正在阻塞等待其他线程进行 put 或 take
         static final int FULFILLING = 2;
         // 栈 头
         volatile SNode head;
-        // 栈中元素
+        // 栈中的节点
         static final class SNode {
             // 栈的下一个，就是被当前栈压在下面的栈元素
             volatile SNode next;
@@ -208,10 +222,11 @@ public class SynchronousQueue<E> extends AbstractQueue<E>
             // 当有 put 操作时，会把阻塞的栈元素的 match 属性赋值
             // 当阻塞的栈元素发现 match 有值时，就会停止阻塞
             volatile SNode match;
-            // 被阻塞线程，栈中元素是无法被阻塞的，是通过线程阻塞来实现的
+            // 等待着的线程 被阻塞线程，栈中元素是无法被阻塞的，是通过线程阻塞来实现的
             volatile Thread waiter;
             //未投递的消息，或者未消费的消息
             Object item;
+            // 模式，也就是节点的类型，是消费者，是生产者，还是正在撮合中
             int mode;
             // Note: item and mode fields don't need to be volatile
             // since they are always written before, and read after,
@@ -535,8 +550,10 @@ public class SynchronousQueue<E> extends AbstractQueue<E>
             // 当前元素的值
             volatile Object item;         // CAS'ed to or from null
             // 可以阻塞住的当前线程
+            // 等待着的线程
             volatile Thread waiter;       // to control park/unpark
             // true 是 put，false 是 take
+            // 是否是数据节点
             final boolean isData;
 
             QNode(Object item, boolean isData) {
@@ -833,17 +850,14 @@ public class SynchronousQueue<E> extends AbstractQueue<E>
         }
     }
 
+    // 传输器，即两个线程交换元素使用的东西
     private transient volatile Transferer<E> transferer;
 
     // 默认为非公平的
     public SynchronousQueue(boolean fair) {
+        // 如果是公平模式就使用队列，如果是非公平模式就使用栈
         transferer = fair ? new TransferQueue<E>() : new TransferStack<E>();
     }
-
-
-
-
-
 
 
 
@@ -852,7 +866,10 @@ public class SynchronousQueue<E> extends AbstractQueue<E>
         //e为空，抛异常
         if (e == null) throw new NullPointerException();
         //一直等待
+        // 直接调用传输器的transfer()方法
+        // 三个参数分别是：传输的元素，是否需要超时，超时的时间
         if (transferer.transfer(e, false, 0) == null) {
+            // 如果传输失败，直接让线程中断并抛出中断异常
             Thread.interrupted();
             throw new InterruptedException();
         }
@@ -860,9 +877,14 @@ public class SynchronousQueue<E> extends AbstractQueue<E>
 
     //从队列头拿数据并删除数据，成功返回，失败打断线程
     public E take() throws InterruptedException {
+        // 直接调用传输器的transfer()方法
+        // 三个参数分别是：null，是否需要超时，超时的时间
+        // 第一个参数为null表示是消费者，要取元素
         E e = transferer.transfer(null, false, 0);
+        // 如果取到了元素就返回
         if (e != null)
             return e;
+        // 否则让线程中断并抛出中断异常
         Thread.interrupted();
         throw new InterruptedException();
     }
@@ -877,7 +899,7 @@ public class SynchronousQueue<E> extends AbstractQueue<E>
      * seems not to vary with number of CPUs (beyond 2) so is just
      * a constant.
      */
-    //
+    // 有超时的情况自旋多少次，当CPU数量小于2的时候不自旋
     static final int maxTimedSpins = (NCPUS < 2) ? 0 : 32;
 
     /**
@@ -885,12 +907,14 @@ public class SynchronousQueue<E> extends AbstractQueue<E>
      * This is greater than timed value because untimed waits spin
      * faster since they don't need to check times on each spin.
      */
+    // 没有超时的情况自旋多少次
     static final int maxUntimedSpins = maxTimedSpins * 16;
 
     /**
      * The number of nanoseconds for which it is faster to spin
      * rather than to use timed park. A rough estimate suffices.
      */
+    // 针对有超时的情况，自旋了多少次后，如果剩余时间大于1000纳秒就使用带时间的LockSupport.parkNanos()这个方法
     static final long spinForTimeoutThreshold = 1000L;
 
 
@@ -898,6 +922,7 @@ public class SynchronousQueue<E> extends AbstractQueue<E>
     /**
      * Creates a {@code SynchronousQueue} with nonfair access policy.
      */
+    // 默认非公平模式
     public SynchronousQueue() {
         this(false);
     }
