@@ -1,5 +1,7 @@
 package com.geekerstar.wx.interrupt;
 
+import java.util.concurrent.TimeUnit;
+
 public class RunTaskCase3 {
 
     private volatile boolean stopFlag;
