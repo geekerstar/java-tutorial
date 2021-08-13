@@ -156,6 +156,8 @@ public interface ExecutorService extends Executor {
      */
     // 关闭，不会接受新的任务，也不会等待未完成的任务
     // 如果需要等待未完成的任务，可以使用 awaitTermination 方法
+    // 在之前提交的，需要被执行的任务中，有序的进行关闭操作，并且此时不会再接受新的任务
+    // 如果此时所有的任务已经关闭的话，那么就不会起到什么效果，因为已经没有任务可关闭了
     void shutdown();
 
     /**
@@ -180,7 +182,7 @@ public interface ExecutorService extends Executor {
      *         or the security manager's {@code checkAccess} method
      *         denies access.
      */
-    // 试图关闭所有正在执行的任务，返回等待执行的任务列表
+    // 尝试关闭所有正在执行的任务，并且中断正在等待要执行的任务，返回一个包含正在等待的任务的列表
     List<Runnable> shutdownNow();
 
     /**
@@ -212,6 +214,7 @@ public interface ExecutorService extends Executor {
      * @throws InterruptedException if interrupted while waiting
      */
     // 在超时时间内阻塞，等待所有的任务执行完成
+    // 只有当所有的任务都成功执行，否则会一直处于阻塞状态，只有当一下情况发生时，才会中断阻塞例如收到一个关闭的请求，或者超时发生、或者当前的线程被中断后
     boolean awaitTermination(long timeout, TimeUnit unit)
         throws InterruptedException;
 
@@ -239,6 +242,7 @@ public interface ExecutorService extends Executor {
      * @throws NullPointerException if the task is null
      */
     // 提交有返回值的任务，使用 get 方法可以阻塞等待任务的结果返回
+    // 提交一个需要返回结果的任务去执行，返回一个有结果的消息体，只有成功执行后，才会返回结果
     <T> Future<T> submit(Callable<T> task);
 
     /**
@@ -253,6 +257,7 @@ public interface ExecutorService extends Executor {
      *         scheduled for execution
      * @throws NullPointerException if the task is null
      */
+    // 只有当任务成功被执行后，才会返回给定的结果
     <T> Future<T> submit(Runnable task, T result);
 
     /**
@@ -268,6 +273,7 @@ public interface ExecutorService extends Executor {
      */
     // 提交没有返回值的任务
     // 任务执行完成之后，返回 null 值
+    // 提交一个Runnable任务用于执行，和返回代表任务的Future。Future的get方法成功执行后，返回null
     Future<?> submit(Runnable task);
 
     /**
@@ -291,6 +297,7 @@ public interface ExecutorService extends Executor {
      *         scheduled for execution
      */
     // 给定任务集合，返回已经执行完成的 Future 集合，每个返回的 Future 都是 isDone = true 的状态
+    // 提交一批任务，并返回一批任务的结果列表
     <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks)
         throws InterruptedException;
 
@@ -322,6 +329,7 @@ public interface ExecutorService extends Executor {
      * @throws RejectedExecutionException if any task cannot be scheduled
      *         for execution
      */
+    // 执行给定的任务集合，执行完毕或者超时后，返回结果，其他任务终止
     <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks,
                                   long timeout, TimeUnit unit)
         throws InterruptedException;
@@ -370,6 +378,7 @@ public interface ExecutorService extends Executor {
      * @throws RejectedExecutionException if tasks cannot be scheduled
      *         for execution
      */
+    // 执行给定的任务集合，任意一个执行成功或超时后，返回结果，其他任务终止
     <T> T invokeAny(Collection<? extends Callable<T>> tasks,
                     long timeout, TimeUnit unit)
         throws InterruptedException, ExecutionException, TimeoutException;

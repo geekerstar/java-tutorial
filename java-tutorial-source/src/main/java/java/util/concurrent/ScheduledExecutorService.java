@@ -107,6 +107,7 @@ public interface ScheduledExecutorService extends ExecutorService {
      *         scheduled for execution
      * @throws NullPointerException if command is null
      */
+    //创建并执行一个一次性任务, 过了延迟时间就会被执行
     public ScheduledFuture<?> schedule(Runnable command,
                                        long delay, TimeUnit unit);
 
@@ -123,6 +124,7 @@ public interface ScheduledExecutorService extends ExecutorService {
      *         scheduled for execution
      * @throws NullPointerException if callable is null
      */
+    //创建并执行一个一次性任务, 过了延迟时间就会被执行
     public <V> ScheduledFuture<V> schedule(Callable<V> callable,
                                            long delay, TimeUnit unit);
 
@@ -151,6 +153,11 @@ public interface ScheduledExecutorService extends ExecutorService {
      * @throws NullPointerException if command is null
      * @throws IllegalArgumentException if period less than or equal to zero
      */
+    //创建并执行一个周期性任务
+    //过了给定的初始延迟时间，会第一次被执行
+    //执行过程中发生了异常,那么任务就停止
+    //一次任务 执行时长超过了周期时间，下一次任务会等到该次任务执行结束后，立刻执行，
+    //这也是它和scheduleWithFixedDelay的重要区别
     public ScheduledFuture<?> scheduleAtFixedRate(Runnable command,
                                                   long initialDelay,
                                                   long period,
@@ -178,6 +185,11 @@ public interface ScheduledExecutorService extends ExecutorService {
      * @throws NullPointerException if command is null
      * @throws IllegalArgumentException if delay less than or equal to zero
      */
+    //创建并执行一个周期性任务
+    //过了初始延迟时间，第一次被执行，后续以给定的周期时间执行
+    //执行过程中发生了异常,那么任务就停止
+    //一次任务执行时长超过了周期时间，下一次任务会在该次任务执行结束的时间基础上，计算执行延时。
+    //对于超过周期的长时间处理任务的不同处理方式，这是它和scheduleAtFixedRate的重要区别。
     public ScheduledFuture<?> scheduleWithFixedDelay(Runnable command,
                                                      long initialDelay,
                                                      long delay,
