@@ -1281,22 +1281,28 @@ class Thread implements Runnable {
             throw new IllegalArgumentException("timeout value is negative");
         }
 
+        // 0则需要一直等到目标线程run完
         if (millis == 0) {
             // 其他线程好了之后，当前线程的状态是 TERMINATED,isAlive 返回 false
             // NEW false
             // RUNNABLE true
+            // 如果被调用join方法的线程是alive状态，则调用join的方法
             while (isAlive()) {
                 // 等待其他线程,一直等待
+                // == this.wait(0),注意这里释放的是「被调用」join方法的线程对象的锁
                 wait(0);
             }
         } else {
+            // 如果目标线程未run完且阻塞时间未到，那么调用线程会一直等待。
             while (isAlive()) {
                 long delay = millis - now;
                 if (delay <= 0) {
                     break;
                 }
                 // 等待一定的时间，如果在 delay 时间内，等待的线程仍没有结束，放弃等待
+                // 每次最多等待delay毫秒时间后继续争抢对象锁，获取锁后继续从这里开始的下一行执行，也可能提前被notify() * /notifyAll()唤醒，造成delay未一次性消耗完，会继续执行while继续wait(剩下的delay)
                 wait(delay);
+                // 这个变量now起的不太好，叫elapsedMillis就容易理解了
                 now = System.currentTimeMillis() - base;
             }
         }
