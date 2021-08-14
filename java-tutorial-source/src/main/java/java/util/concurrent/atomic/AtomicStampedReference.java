@@ -142,16 +142,30 @@ public class AtomicStampedReference<V> {
      * @param newStamp the new value for the stamp
      * @return {@code true} if successful
      */
+    /**
+     * 如果当前引用等于预期引用并且当前标志等于预期标志
+     * 则以原子方式将该引用和该标志的值设置为给定新值
+     *
+     * @param expectedReference 预期引用值
+     * @param newReference 新的引用值
+     * @param expectedStamp 预期标记值
+     * @param newStamp 新标记值
+     * @return {@code true} if successful
+     */
     public boolean compareAndSet(V   expectedReference,
                                  V   newReference,
                                  int expectedStamp,
                                  int newStamp) {
         Pair<V> current = pair;
         return
+                //预期引用==当前引用
             expectedReference == current.reference &&
+                    //预期标志==当前标志
             expectedStamp == current.stamp &&
+                    //新引用==当前引用 并且 新标志==当前标志
             ((newReference == current.reference &&
               newStamp == current.stamp) ||
+                    //原子更新值
              casPair(current, Pair.of(newReference, newStamp)));
     }
 

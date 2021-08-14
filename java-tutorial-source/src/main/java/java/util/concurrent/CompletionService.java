@@ -70,6 +70,7 @@ public interface CompletionService<V> {
      *         scheduled for execution
      * @throws NullPointerException if the task is null
      */
+    //submit 用于提交一个 Callable 对象，用于提交一个可以获得结果的线程任务
     Future<V> submit(Callable<V> task);
 
     /**
@@ -86,6 +87,7 @@ public interface CompletionService<V> {
      *         scheduled for execution
      * @throws NullPointerException if the task is null
      */
+    // submit 用于提交一个 Runnable 对象及 result 对象，类似于上面的 submit，但是 runnable 的返回值 void 无法获得线程的结果，所以添加了 result 用于做为参数的桥梁
     Future<V> submit(Runnable task, V result);
 
     /**
@@ -95,6 +97,7 @@ public interface CompletionService<V> {
      * @return the Future representing the next completed task
      * @throws InterruptedException if interrupted while waiting
      */
+    //take 用于取出最新的线程执行结果，注意这里是阻塞的
     Future<V> take() throws InterruptedException;
 
     /**
@@ -104,6 +107,7 @@ public interface CompletionService<V> {
      * @return the Future representing the next completed task, or
      *         {@code null} if none are present
      */
+    //take 用于取出最新的线程执行结果，是非阻塞的，如果没有结果就返回 null
     Future<V> poll();
 
     /**
@@ -120,5 +124,6 @@ public interface CompletionService<V> {
      *         before one is present
      * @throws InterruptedException if interrupted while waiting
      */
+    //同上，只是加了一个超时时间
     Future<V> poll(long timeout, TimeUnit unit) throws InterruptedException;
 }
